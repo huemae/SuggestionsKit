@@ -1,0 +1,16 @@
+PODS:
+  - SuggestionsKit (0.1.0)
+
+DEPENDENCIES:
+  - SuggestionsKit (from `../`)
+
+EXTERNAL SOURCES:
+  SuggestionsKit:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  SuggestionsKit: 1b51331c4aa4e6c3b6a54cdcaa8858d839a7d244
+
+PODFILE CHECKSUM: cfb16e8f0afe2c34982fa0a5d3e593a7cfd757db
+
+COCOAPODS: 1.8.4
