@@ -7,7 +7,7 @@
 
 ## Description
 
-SuggestionsKit is a framework that was created in order to provide developers with the opportunity to educate users on various features of applications.
+SuggestionsKit is a framework for iOS written in Swift that was created in order to provide developers with the opportunity to educate users on various features of applications.
 
 ## Features
 
