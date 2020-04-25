@@ -12,8 +12,8 @@ import UIKit
 class SuggestionsFillLayer {
     
     var suggestionFrameClosue: ((SuggestionsManager.Suggestion) -> CGRect)?
-    var holeRectUpdatedClosue: ((CGRect) -> ())!
-    var holeMoveDurationUpdatedClosue: ((TimeInterval) -> ())!
+    var holeRectUpdatedClosue: ((CGRect) -> ())?
+    var holeMoveDurationUpdatedClosue: ((TimeInterval) -> ())?
     
     private let layer = CAShapeLayer()
     private let mainPath: UIBezierPath
@@ -21,7 +21,7 @@ class SuggestionsFillLayer {
     private var holeRect: CGRect = .zero
     private var animationDuration: TimeInterval = 0
     
-    init(parent: CALayer, config: SuggestionsObject.Config) {
+    init(parent: CALayer, config: SuggestionsConfig) {
         mainPath = UIBezierPath(rect: parent.bounds)
         commonInit(parent: parent, config: config)
     }
@@ -41,7 +41,7 @@ private extension SuggestionsFillLayer {
         
         let finalRadius = SuggestionsObject.Constant.minimalCornerRadius
         
-        let fakeNewPath = mainPath.copy() as! UIBezierPath
+        let fakeNewPath = mainPath.copy() as? UIBezierPath ?? UIBezierPath()
         
         if let lastPath = lastHolePath {
             fakeNewPath.append(lastPath)
@@ -55,14 +55,14 @@ private extension SuggestionsFillLayer {
         let halfOverdraw = SuggestionsObject.Constant.holeOverdrawAmount / 2
         
         holeRect = CGRect(x: sugFrame.origin.x - halfOverdraw, y: sugFrame.origin.y - halfOverdraw, width: width, height: height)
-        holeRectUpdatedClosue(holeRect)
+        holeRectUpdatedClosue?(holeRect)
         let circlePath = UIBezierPath(roundedRect: self.holeRect, cornerRadius: finalRadius)
         self.lastHolePath = circlePath
-        let newPath = mainPath.copy() as! UIBezierPath
+        let newPath = mainPath.copy() as? UIBezierPath ?? UIBezierPath()
         newPath.append(circlePath)
         
         animationDuration = calculateDuration(distance: CGPointDistance(from: fakeNewPath.currentPoint, to: newPath.currentPoint))
-        holeMoveDurationUpdatedClosue(animationDuration)
+        holeMoveDurationUpdatedClosue?(animationDuration)
         
         let pathAnimation = CAKeyframeAnimation(keyPath: "path")
         pathAnimation.values = [fakeNewPath.cgPath, newPath.cgPath]
@@ -97,7 +97,7 @@ private extension SuggestionsFillLayer {
         return calculatedTime
     }
     
-    func commonInit(parent: CALayer, config: SuggestionsObject.Config) {
+    func commonInit(parent: CALayer, config: SuggestionsConfig) {
         layer.fillRule = CAShapeLayerFillRule.evenOdd
         layer.contentsScale = UIScreen.main.scale
         layer.fillColor = config.background.color.cgColor

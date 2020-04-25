@@ -23,7 +23,7 @@ class ViewController: UIViewController {
     func showSuggestions() {
         let subviews = allViews.sorted(by: { $0.frame.origin.y < $1.frame.origin.y })
         let suggestions = subviews.compactMap { ($0, self.textForComponent(view: $0)) }
-        manager = SuggestionsManager(with: suggestions, mainView: view)
+        manager = SuggestionsManager(with: suggestions, mainView: view, config: nil)
         manager?.startShowing()
     }
     

@@ -14,7 +14,7 @@ class SuggestionsBlurLayer {
     
     private let layer: CAShapeLayer = CAShapeLayer()
     
-    init(parent: CALayer, config: SuggestionsObject.Config, tempLayerClosure: (CALayer) -> ()) {
+    init(parent: CALayer, config: SuggestionsConfig, tempLayerClosure: (CALayer) -> ()) {
         commonInit(parent: parent, config: config)
         tempLayerClosure(layer)
     }
@@ -22,16 +22,16 @@ class SuggestionsBlurLayer {
 
 private extension SuggestionsBlurLayer {
     
-    func convert(cmage: CIImage) -> CGImage {
-        let context:CIContext = CIContext(options: nil)
-        let cgImage:CGImage = context.createCGImage(cmage, from: cmage.extent)!
+    func convert(cmage: CIImage) -> CGImage? {
+        let context: CIContext = CIContext(options: nil)
+        guard let cgImage: CGImage = context.createCGImage(cmage, from: cmage.extent) else { return nil }
         
         return cgImage
     }
     
     func renderBackgroundImage(parent: CALayer) -> CGImage? {
         UIGraphicsBeginImageContextWithOptions(parent.bounds.size, true, UIScreen.main.scale)
-        let context = UIGraphicsGetCurrentContext()!
+        guard let context = UIGraphicsGetCurrentContext() else { return nil }
         parent.superlayer?.render(in: context)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -54,7 +54,7 @@ private extension SuggestionsBlurLayer {
         return nil
     }
     
-    func commonInit(parent: CALayer, config: SuggestionsObject.Config) {
+    func commonInit(parent: CALayer, config: SuggestionsConfig) {
         layer.isGeometryFlipped = true
         layer.contents = renderBackgroundImage(parent: parent)
         layer.frame = parent.bounds

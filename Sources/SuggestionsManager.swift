@@ -19,9 +19,9 @@ final public class SuggestionsManager {
     private var suggestionsOverlay: SuggestionsObject?
     
     
-    public init(with suggestions:[Suggestion], mainView: UIView) {
+    public init(with suggestions: [Suggestion], mainView: UIView, config: SuggestionsConfig?) {
         self.suggestions = suggestions
-        start(with: mainView)
+        start(with: mainView, config: config)
     }
     
     public func startShowing() {
@@ -44,8 +44,9 @@ private extension SuggestionsManager {
         suggestionsOverlay?.updateForSuggestion(suggestion: sug)
     }
     
-    func start(with main: UIView) {
-        suggestionsOverlay = SuggestionsObject(with: main, config: nil)
+    func start(with main: UIView, config: SuggestionsConfig?) {
+        guard let window = main.window else { return }
+        suggestionsOverlay = SuggestionsObject(with: window, config: config)
         
         suggestionsOverlay?.viewTappedBlock = { [weak self] in
             self?.suggestions.removeFirst()
