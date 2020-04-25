@@ -5,6 +5,32 @@
 [![License](https://img.shields.io/cocoapods/l/SuggestionsKit.svg?style=flat)](https://cocoapods.org/pods/SuggestionsKit)
 [![Platform](https://img.shields.io/cocoapods/p/SuggestionsKit.svg?style=flat)](https://cocoapods.org/pods/SuggestionsKit)
 
+## Description
+
+SuggestionsKit is a framework that was created in order to provide developers with the opportunity to educate users on various features of applications.
+
+## Features
+
+* Easy to use in project
+* Nice looking animations
+* Customizable settings
+
+## Usage
+
+First of all you simply just create reference
+```swift
+var manager: SuggestionsManager?
+```
+For creating ```SuggestionsManager``` you need to create array of suggestions.
+Suggestion is simple typealias to tuple of UIView and String
+```swift
+public typealias Suggestion = (view: UIView, text: String)
+```
+After you create array of suggestion you are ready to create SuggestionManager. Simply call this to create Manager and instanly start to show suggestions to users
+```swift
+manager = SuggestionsManager(with: suggestions, mainView: view, config: nil)
+manager?.startShowing()
+```
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
