@@ -1,5 +1,7 @@
 # SuggestionsKit
 
+![SuggestionsKit](https://i.imgur.com/CZHSb7D.gif)
+
 [![CI Status](https://img.shields.io/travis/huemae/SuggestionsKit.svg?style=flat)](https://travis-ci.org/huemae/SuggestionsKit)
 [![Version](https://img.shields.io/cocoapods/v/SuggestionsKit.svg?style=flat)](https://cocoapods.org/pods/SuggestionsKit)
 [![License](https://img.shields.io/cocoapods/l/SuggestionsKit.svg?style=flat)](https://cocoapods.org/pods/SuggestionsKit)
