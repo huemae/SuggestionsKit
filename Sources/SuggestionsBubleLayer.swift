@@ -12,9 +12,9 @@ import UIKit
 class SuggestionsBubleLayer {
     
     private var layer = CAShapeLayer()
-    private var config: SuggestionsObject.Config!
+    private let config: SuggestionsConfig
     
-    init(parent: CALayer, config: SuggestionsObject.Config, tempLayerClosure: (CALayer) -> ()) {
+    init(parent: CALayer, config: SuggestionsConfig, tempLayerClosure: (CALayer) -> ()) {
         self.config = config
         commonInit(parent: parent, config: config)
     }
@@ -116,7 +116,7 @@ private extension SuggestionsBubleLayer {
         CATransaction.commit()
     }
     
-    func commonInit(parent: CALayer, config: SuggestionsObject.Config) {
+    func commonInit(parent: CALayer, config: SuggestionsConfig) {
         layer.fillRule = CAShapeLayerFillRule.evenOdd
         layer.contentsScale = UIScreen.main.scale
         layer.strokeColor = config.buble.borderColor.cgColor

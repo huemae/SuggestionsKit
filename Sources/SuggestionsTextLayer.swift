@@ -13,12 +13,12 @@ import UIKit
 class SuggestionsTextLayer {
 
     var suggestionFrameClosue: ((SuggestionsManager.Suggestion) -> CGRect)?
-    var textLayerUpdatedFrameClosue: ((CGRect) -> ())!
+    var textLayerUpdatedFrameClosue: ((CGRect) -> ())?
     
-    private var config: SuggestionsObject.Config!
+    private let config: SuggestionsConfig
     private var layer: CATextLayer = CATextLayer()
     
-    init(parent: CALayer, config: SuggestionsObject.Config) {
+    init(parent: CALayer, config: SuggestionsConfig) {
         self.config = config
         commonInit(parent: parent, config: config)
     }
@@ -104,7 +104,7 @@ private extension SuggestionsTextLayer {
         groupAnimation.isRemovedOnCompletion = true
         layer.frame = newFrame
         layer.string = newString
-        textLayerUpdatedFrameClosue(newFrame)
+        textLayerUpdatedFrameClosue?(newFrame)
         CATransaction.begin()
         CATransaction.setCompletionBlock { [weak self] in
             self?.layer.removeAnimation(forKey: "bounds")
@@ -116,7 +116,7 @@ private extension SuggestionsTextLayer {
         CATransaction.commit()
     }
     
-    func commonInit(parent: CALayer, config: SuggestionsObject.Config) {
+    func commonInit(parent: CALayer, config: SuggestionsConfig) {
         layer.contentsScale = UIScreen.main.scale
         layer.isWrapped = true
         layer.truncationMode = .none

@@ -11,35 +11,6 @@ import UIKit
 
 class SuggestionsObject {
     
-    struct Config {
-        
-        struct BubleConfig {
-            let shouldDraw: Bool
-            let tailHeight: CGFloat
-            let focusOffset: CGFloat
-            let cornerRadius: CGFloat
-            let borderWidth: CGFloat
-            let borderColor: UIColor
-            let backgroundColor: UIColor
-        }
-        
-        struct TextConfig {
-            let textColor: UIColor
-            let font: UIFont
-        }
-        
-        struct Background {
-            let opacity: CGFloat
-            let blurred: Bool
-            let color: UIColor
-        }
-
-        let buble: BubleConfig
-        let text: TextConfig
-        let background: Background
-        let animationsTimingFunction: CAMediaTimingFunctionName
-    }
-    
     enum Constant {
         static let spaceBetweenOverlayAndText: CGFloat = 10.0
         static let bubleOffset: CGFloat = 10.0
@@ -54,7 +25,7 @@ class SuggestionsObject {
     private var blurLayer: SuggestionsBlurLayer?
     private var unblurLayer: SuggestionsUnblurLayer?
     private var mainView: UIView?
-    private var superview: UIView!
+    private var superview: UIView?
     
     private var mainPath: UIBezierPath?
     private var lastHolePath: UIBezierPath?
@@ -64,7 +35,7 @@ class SuggestionsObject {
     private var textLayerRect: CGRect = .zero
     private var holeMoveDuration: TimeInterval = 0
     
-    private var config: Config?
+    private var config: SuggestionsConfig?
     
     private var view: UIView {
         guard let view = mainView else { preconditionFailure("") }
@@ -100,21 +71,21 @@ class SuggestionsObject {
         }
     }
     
-    private let defaultConfig: Config = {
-        let buble = Config.BubleConfig(shouldDraw: true, tailHeight: 5, focusOffset: 5, cornerRadius: 10, borderWidth: 0.5, borderColor: UIColor.clear, backgroundColor: UIColor.black)
-        let text = Config.TextConfig(textColor: UIColor.white, font: UIFont.systemFont(ofSize: 15, weight: .thin))
-        let background = Config.Background(opacity: 0.5, blurred: true, color: UIColor.black)
+    private let defaultConfig: SuggestionsConfig = {
+        let buble = SuggestionsConfig.BubleConfig(shouldDraw: true, tailHeight: 5, focusOffset: 5, cornerRadius: 10, borderWidth: 0.5, borderColor: UIColor.clear, backgroundColor: UIColor.black)
+        let text = SuggestionsConfig.TextConfig(textColor: UIColor.white, font: UIFont.systemFont(ofSize: 15, weight: .thin))
+        let background = SuggestionsConfig.Background(opacity: 0.5, blurred: true, color: UIColor.black)
         
-        return Config(buble: buble, text: text, background: background, animationsTimingFunction: CAMediaTimingFunctionName.linear)
+        return SuggestionsConfig(buble: buble, text: text, background: background, animationsTimingFunction: CAMediaTimingFunctionName.linear)
     }()
     
-    private var currentConfig: Config {
+    private var currentConfig: SuggestionsConfig {
         return config ?? defaultConfig
     }
     
     var viewTappedBlock: (() -> ())?
     
-    init(with superview: UIView, config: Config? = nil) {
+    init(with superview: UIView, config: SuggestionsConfig? = nil) {
         configure(with: config, superview: superview)
     }
     
@@ -153,7 +124,7 @@ private extension SuggestionsObject {
         if #available(iOS 11.0, *) {
             return frame.inset(by: UIEdgeInsets(top: insets.top + offset, left: insets.left + offset, bottom: insets.bottom + offset, right: insets.right + offset))
         } else {
-           return frame.inset(by: UIEdgeInsets(top: offset, left:offset, bottom:offset, right: offset))
+            return frame.inset(by: UIEdgeInsets(top: offset, left:offset, bottom:offset, right: offset))
         }
     }
     
@@ -194,7 +165,7 @@ private extension SuggestionsObject {
         view.backgroundColor = UIColor.clear
     }
     
-    func configreDimmLayer(config: Config) {
+    func configreDimmLayer(config: SuggestionsConfig) {
         
         let dimm = SuggestionsFillLayer(parent: layer, config: config)
         dimm.holeMoveDurationUpdatedClosue = { [weak self] duration in
@@ -212,7 +183,7 @@ private extension SuggestionsObject {
         fillLayer = dimm
     }
     
-    func configureBubleLayer(config: Config) -> CALayer? {
+    func configureBubleLayer(config: SuggestionsConfig) -> CALayer? {
         guard currentConfig.buble.shouldDraw else { return nil }
         var tempLayer: CALayer?
         let buble = SuggestionsBubleLayer(parent: layer, config: config, tempLayerClosure: { layer in
@@ -223,7 +194,7 @@ private extension SuggestionsObject {
         return tempLayer
     }
     
-    func configureTextLayer(superLayer: CALayer?, config: Config) {
+    func configureTextLayer(superLayer: CALayer?, config: SuggestionsConfig) {
         let bubleLayer = superLayer ?? layer
         let textLayer = SuggestionsTextLayer(parent: bubleLayer, config: config)
         textLayer.suggestionFrameClosue = { [weak self] suggestion in
@@ -236,12 +207,12 @@ private extension SuggestionsObject {
         self.textLayer = textLayer
     }
     
-    func configureUnblurLayer(with blur: CALayer?, config: Config) {
+    func configureUnblurLayer(with blur: CALayer?, config: SuggestionsConfig) {
         guard let superBlur = blur else { return }
         unblurLayer = SuggestionsUnblurLayer(maskedLayer: superBlur, superBunds: bounds)
     }
     
-    func configureBlurLayer(config: Config) -> CALayer? {
+    func configureBlurLayer(config: SuggestionsConfig) -> CALayer? {
         guard config.background.blurred else { return nil }
         var newLayer: CALayer?
         blurLayer = SuggestionsBlurLayer(parent: layer, config: config, tempLayerClosure: { layer in
@@ -251,7 +222,7 @@ private extension SuggestionsObject {
         return newLayer
     }
     
-    func configureSublayers(config: Config) {
+    func configureSublayers(config: SuggestionsConfig) {
         let newLayer = configureBlurLayer(config: config)
         configureUnblurLayer(with: newLayer, config: config)
         configreDimmLayer(config: config)
@@ -266,7 +237,7 @@ private extension SuggestionsObject {
         mainView = main
     }
     
-    func configure(with config: Config?, superview: UIView) {
+    func configure(with config: SuggestionsConfig?, superview: UIView) {
         self.config = config
         configureMainView(superview: superview)
         configureGestures()

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D204230245475B50028724D /* SuggestionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D20422F245475B50028724D /* SuggestionConfig.swift */; };
 		0DC402EE2452CA6400F81413 /* SuggestionsKit-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DC402E82452CA6400F81413 /* SuggestionsKit-Info.plist */; };
 		0DC402EF2452CA6400F81413 /* SuggestionsKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DC402E92452CA6400F81413 /* SuggestionsKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0DC402F02452CA6400F81413 /* SuggestionsKit-prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 0DC402EA2452CA6400F81413 /* SuggestionsKit-prefix.pch */; };
@@ -56,6 +57,7 @@
 /* Begin PBXFileReference section */
 		01C2443ADBCF50DDEAC0CBAB498E96A6 /* Pods_SuggestionsKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SuggestionsKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		02A8DFA4E632D712775D9F65B96CF4AE /* Pods-SuggestionsKit_Tests-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SuggestionsKit_Tests-Info.plist"; sourceTree = "<group>"; };
+		0D20422F245475B50028724D /* SuggestionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionConfig.swift; sourceTree = "<group>"; };
 		0DC402E82452CA6400F81413 /* SuggestionsKit-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SuggestionsKit-Info.plist"; sourceTree = "<group>"; };
 		0DC402E92452CA6400F81413 /* SuggestionsKit-umbrella.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SuggestionsKit-umbrella.h"; sourceTree = "<group>"; };
 		0DC402EA2452CA6400F81413 /* SuggestionsKit-prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SuggestionsKit-prefix.pch"; sourceTree = "<group>"; };
@@ -137,11 +139,12 @@
 			children = (
 				0DDB168024538F3E000C107E /* SuggestionsBlurLayer.swift */,
 				0DDB168124538F3E000C107E /* SuggestionsUnblurLayer.swift */,
-				0DDB168224538F3E000C107E /* SuggestionsManager.swift */,
 				0DDB168324538F3E000C107E /* SuggestionsBubleLayer.swift */,
-				0DDB168424538F3E000C107E /* SuggestionsObject.swift */,
 				0DDB168524538F3E000C107E /* SuggestionsFillLayer.swift */,
 				0DDB168624538F3E000C107E /* SuggestionsTextLayer.swift */,
+				0DDB168424538F3E000C107E /* SuggestionsObject.swift */,
+				0D20422F245475B50028724D /* SuggestionConfig.swift */,
+				0DDB168224538F3E000C107E /* SuggestionsManager.swift */,
 			);
 			name = Sources;
 			path = SuggestionsKit/Sources;
@@ -426,6 +429,7 @@
 				0DDB168824538F3E000C107E /* SuggestionsUnblurLayer.swift in Sources */,
 				0DC402F22452CA6400F81413 /* SuggestionsKit-dummy.m in Sources */,
 				0DDB168A24538F3E000C107E /* SuggestionsBubleLayer.swift in Sources */,
+				0D204230245475B50028724D /* SuggestionConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
