@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 
+/// Manager that present interface to show suggestions
 final public class SuggestionsManager {
     
     public typealias Suggestion = (view: UIView, text: String)
@@ -19,11 +20,17 @@ final public class SuggestionsManager {
     private var suggestionsOverlay: SuggestionsObject?
     
     
+    /// This method presents initialization for SuggestionsManager
+    /// - Parameters:
+    ///   - suggestions: Array of suggestions that you want to show to the user
+    ///   - mainView: View that contains suggestions
+    ///   - config: Configuration that will be applied to all suggestions shown by this manager
     public init(with suggestions: [Suggestion], mainView: UIView, config: SuggestionsConfig?) {
         self.suggestions = suggestions
         start(with: mainView, config: config)
     }
     
+    /// Call this method to start presentation of suggestions
     public func startShowing() {
         updateSuggestion()
     }
