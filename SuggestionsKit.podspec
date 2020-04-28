@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'SuggestionsKit'
-  s.version          = '1.1.1'
+  s.version          = '1.1.2'
   s.summary          = 'This framework was created in order to provide developers with the opportunity to educate users on various features of applications.'
   s.swift_version = '4.2'
 
@@ -27,7 +27,7 @@ TODO: Add long description of the pod here.
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'huemae' => '' }
   s.source           = { :git => 'https://github.com/huemae/SuggestionsKit.git', :branch => "master" }
-  s.source_files = 'Sources/**/*'
+  s.source_files  = ["Sources/**/*.swift", "Sources/SuggestionsKit.h"]
   s.ios.deployment_target = '9.0'
 
   
