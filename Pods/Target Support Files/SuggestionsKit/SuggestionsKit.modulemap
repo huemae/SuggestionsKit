@@ -1,6 +1,0 @@
-framework module SuggestionsKit {
-  umbrella header "SuggestionsKit-umbrella.h"
-
-  export *
-  module * { export * }
-}
