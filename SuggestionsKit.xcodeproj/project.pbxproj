@@ -8,28 +8,32 @@
 
 /* Begin PBXBuildFile section */
 		0D34C22F2456FEE200C71396 /* SuggestionsKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D34C22D2456FEE200C71396 /* SuggestionsKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		0D34C2402456FF0F00C71396 /* SuggestionsBlurLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C2362456FF0F00C71396 /* SuggestionsBlurLayer.swift */; };
-		0D34C2412456FF0F00C71396 /* SuggestionsUnblurLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C2372456FF0F00C71396 /* SuggestionsUnblurLayer.swift */; };
+		0D34C2402456FF0F00C71396 /* BlurLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C2362456FF0F00C71396 /* BlurLayer.swift */; };
+		0D34C2412456FF0F00C71396 /* UnblurLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C2372456FF0F00C71396 /* UnblurLayer.swift */; };
 		0D34C2432456FF0F00C71396 /* SuggestionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C2392456FF0F00C71396 /* SuggestionsManager.swift */; };
 		0D34C2442456FF0F00C71396 /* SuggestionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C23A2456FF0F00C71396 /* SuggestionConfig.swift */; };
-		0D34C2452456FF0F00C71396 /* SuggestionsBubleLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C23B2456FF0F00C71396 /* SuggestionsBubleLayer.swift */; };
+		0D34C2452456FF0F00C71396 /* BubleLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C23B2456FF0F00C71396 /* BubleLayer.swift */; };
 		0D34C2462456FF0F00C71396 /* SuggestionsObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C23C2456FF0F00C71396 /* SuggestionsObject.swift */; };
-		0D34C2472456FF0F00C71396 /* SuggestionsFillLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C23D2456FF0F00C71396 /* SuggestionsFillLayer.swift */; };
-		0D34C2482456FF0F00C71396 /* SuggestionsTextLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C23E2456FF0F00C71396 /* SuggestionsTextLayer.swift */; };
+		0D34C2472456FF0F00C71396 /* FillLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C23D2456FF0F00C71396 /* FillLayer.swift */; };
+		0D34C2482456FF0F00C71396 /* TextLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D34C23E2456FF0F00C71396 /* TextLayer.swift */; };
+		0D5B2C25245EB9AC00E0BD01 /* MainViewLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5B2C24245EB9AC00E0BD01 /* MainViewLayer.swift */; };
+		0DE9648A245D7CD500B1E8B4 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE96489245D7CD500B1E8B4 /* MainView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0D34C22A2456FEE200C71396 /* SuggestionsKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SuggestionsKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0D34C22D2456FEE200C71396 /* SuggestionsKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SuggestionsKit.h; path = Sources/SuggestionsKit.h; sourceTree = "<group>"; };
 		0D34C22E2456FEE200C71396 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = Sources/Info.plist; sourceTree = "<group>"; };
-		0D34C2362456FF0F00C71396 /* SuggestionsBlurLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestionsBlurLayer.swift; sourceTree = "<group>"; };
-		0D34C2372456FF0F00C71396 /* SuggestionsUnblurLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestionsUnblurLayer.swift; sourceTree = "<group>"; };
+		0D34C2362456FF0F00C71396 /* BlurLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlurLayer.swift; sourceTree = "<group>"; };
+		0D34C2372456FF0F00C71396 /* UnblurLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnblurLayer.swift; sourceTree = "<group>"; };
 		0D34C2392456FF0F00C71396 /* SuggestionsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestionsManager.swift; sourceTree = "<group>"; };
 		0D34C23A2456FF0F00C71396 /* SuggestionConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestionConfig.swift; sourceTree = "<group>"; };
-		0D34C23B2456FF0F00C71396 /* SuggestionsBubleLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestionsBubleLayer.swift; sourceTree = "<group>"; };
+		0D34C23B2456FF0F00C71396 /* BubleLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BubleLayer.swift; sourceTree = "<group>"; };
 		0D34C23C2456FF0F00C71396 /* SuggestionsObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestionsObject.swift; sourceTree = "<group>"; };
-		0D34C23D2456FF0F00C71396 /* SuggestionsFillLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestionsFillLayer.swift; sourceTree = "<group>"; };
-		0D34C23E2456FF0F00C71396 /* SuggestionsTextLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestionsTextLayer.swift; sourceTree = "<group>"; };
+		0D34C23D2456FF0F00C71396 /* FillLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FillLayer.swift; sourceTree = "<group>"; };
+		0D34C23E2456FF0F00C71396 /* TextLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextLayer.swift; sourceTree = "<group>"; };
+		0D5B2C24245EB9AC00E0BD01 /* MainViewLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewLayer.swift; sourceTree = "<group>"; };
+		0DE96489245D7CD500B1E8B4 /* MainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,14 +76,16 @@
 		0D34C2352456FF0F00C71396 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				0D34C2362456FF0F00C71396 /* SuggestionsBlurLayer.swift */,
-				0D34C2372456FF0F00C71396 /* SuggestionsUnblurLayer.swift */,
 				0D34C2392456FF0F00C71396 /* SuggestionsManager.swift */,
-				0D34C23A2456FF0F00C71396 /* SuggestionConfig.swift */,
-				0D34C23B2456FF0F00C71396 /* SuggestionsBubleLayer.swift */,
 				0D34C23C2456FF0F00C71396 /* SuggestionsObject.swift */,
-				0D34C23D2456FF0F00C71396 /* SuggestionsFillLayer.swift */,
-				0D34C23E2456FF0F00C71396 /* SuggestionsTextLayer.swift */,
+				0D34C23A2456FF0F00C71396 /* SuggestionConfig.swift */,
+				0DE96489245D7CD500B1E8B4 /* MainView.swift */,
+				0D5B2C24245EB9AC00E0BD01 /* MainViewLayer.swift */,
+				0D34C2362456FF0F00C71396 /* BlurLayer.swift */,
+				0D34C2372456FF0F00C71396 /* UnblurLayer.swift */,
+				0D34C23B2456FF0F00C71396 /* BubleLayer.swift */,
+				0D34C23D2456FF0F00C71396 /* FillLayer.swift */,
+				0D34C23E2456FF0F00C71396 /* TextLayer.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -123,7 +129,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1140;
-				ORGANIZATIONNAME = d;
+				ORGANIZATIONNAME = huemae;
 				TargetAttributes = {
 					0D34C2292456FEE200C71396 = {
 						CreatedOnToolsVersion = 11.4;
@@ -164,13 +170,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				0D34C2462456FF0F00C71396 /* SuggestionsObject.swift in Sources */,
-				0D34C2402456FF0F00C71396 /* SuggestionsBlurLayer.swift in Sources */,
-				0D34C2482456FF0F00C71396 /* SuggestionsTextLayer.swift in Sources */,
+				0D5B2C25245EB9AC00E0BD01 /* MainViewLayer.swift in Sources */,
+				0DE9648A245D7CD500B1E8B4 /* MainView.swift in Sources */,
+				0D34C2402456FF0F00C71396 /* BlurLayer.swift in Sources */,
+				0D34C2482456FF0F00C71396 /* TextLayer.swift in Sources */,
 				0D34C2432456FF0F00C71396 /* SuggestionsManager.swift in Sources */,
-				0D34C2472456FF0F00C71396 /* SuggestionsFillLayer.swift in Sources */,
-				0D34C2412456FF0F00C71396 /* SuggestionsUnblurLayer.swift in Sources */,
+				0D34C2472456FF0F00C71396 /* FillLayer.swift in Sources */,
+				0D34C2412456FF0F00C71396 /* UnblurLayer.swift in Sources */,
 				0D34C2442456FF0F00C71396 /* SuggestionConfig.swift in Sources */,
-				0D34C2452456FF0F00C71396 /* SuggestionsBubleLayer.swift in Sources */,
+				0D34C2452456FF0F00C71396 /* BubleLayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

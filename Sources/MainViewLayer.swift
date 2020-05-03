@@ -1,8 +1,8 @@
 //
-//  SuggestionsKit.h
+//  MainViewLayer.swift
 //  SuggestionsKit
 //
-//  Created by huemae on 12.04.2020.
+//  Created by huemae on 03.05.2020.
 //  Copyright (c) 2020 huemae <ilyailusha@hotmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,14 +23,10 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
-
-//! Project version number for SuggestionsKit.
-FOUNDATION_EXPORT double SuggestionsKitVersionNumber;
-
-//! Project version string for SuggestionsKit.
-FOUNDATION_EXPORT const unsigned char SuggestionsKitVersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <SuggestionsKit/PublicHeader.h>
+import Foundation
+import UIKit
 
 
+class MainViewLayer: CALayer {
+    
+}
