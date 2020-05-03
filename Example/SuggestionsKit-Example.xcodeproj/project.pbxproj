@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D5B2C23245EABA200E0BD01 /* SuggestionsKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D5B2C22245EABA200E0BD01 /* SuggestionsKit.framework */; };
 		0D89E89D2456F89F0083B808 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D89E89C2456F89F0083B808 /* AppDelegate.swift */; };
 		0D89E89F2456F89F0083B808 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D89E89E2456F89F0083B808 /* SceneDelegate.swift */; };
 		0D89E8A12456F89F0083B808 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D89E8A02456F89F0083B808 /* ViewController.swift */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0D5B2C22245EABA200E0BD01 /* SuggestionsKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SuggestionsKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0D89E8992456F89F0083B808 /* SuggestionsKit-Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SuggestionsKit-Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0D89E89C2456F89F0083B808 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0D89E89E2456F89F0083B808 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -31,6 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D5B2C23245EABA200E0BD01 /* SuggestionsKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +74,7 @@
 		0D89E8B02456FA000083B808 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0D5B2C22245EABA200E0BD01 /* SuggestionsKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -103,7 +107,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 1140;
 				LastUpgradeCheck = 1140;
-				ORGANIZATIONNAME = d;
+				ORGANIZATIONNAME = huemae;
 				TargetAttributes = {
 					0D89E8982456F89F0083B808 = {
 						CreatedOnToolsVersion = 11.4;
@@ -111,7 +115,7 @@
 				};
 			};
 			buildConfigurationList = 0D89E8942456F89F0083B808 /* Build configuration list for PBXProject "SuggestionsKit-Example" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -293,6 +297,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = EK5J3357BK;
 				INFOPLIST_FILE = "SuggestionsKit-Example/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -311,6 +316,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = EK5J3357BK;
 				INFOPLIST_FILE = "SuggestionsKit-Example/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (

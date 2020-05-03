@@ -1,5 +1,5 @@
 //
-//  SuggestionsKit.h
+//  MainView.swift
 //  SuggestionsKit
 //
 //  Created by huemae on 12.04.2020.
@@ -23,14 +23,47 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
-
-//! Project version number for SuggestionsKit.
-FOUNDATION_EXPORT double SuggestionsKitVersionNumber;
-
-//! Project version string for SuggestionsKit.
-FOUNDATION_EXPORT const unsigned char SuggestionsKitVersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <SuggestionsKit/PublicHeader.h>
+import Foundation
+import UIKit
 
 
+class MainView: UIView {
+    
+    override class var layerClass: AnyClass {
+        return MainViewLayer.self
+    }
+    
+    init(parent: UIView) {
+        super.init(frame: parent.bounds)
+        commonInit(parent: parent)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+    }
+    
+    override func layoutSublayers(of layer: CALayer) {
+        super.layoutSublayers(of: layer)
+    }
+}
+
+private extension MainView {
+    
+    func configureConstraints(parent: UIView) {
+        
+        topAnchor.constraint(equalTo: parent.topAnchor).isActive = true
+        leadingAnchor.constraint(equalTo: parent.leadingAnchor).isActive = true
+        trailingAnchor.constraint(equalTo: parent.trailingAnchor).isActive = true
+        bottomAnchor.constraint(equalTo: parent.bottomAnchor).isActive = true
+    }
+    
+    func commonInit(parent: UIView) {
+        translatesAutoresizingMaskIntoConstraints = false
+        parent.insertSubview(self, at: Int.max)
+        configureConstraints(parent: parent)
+    }
+}

@@ -2,14 +2,31 @@
 //  SuggestionsObject.swift
 //  Suggestions
 //
-//  Created by ilyailusha on 01.04.2020.
-//  Copyright © 2020 ilyailusha. All rights reserved.
+//  Created by huemae on 12.04.2020.
+//  Copyright (c) 2020 huemae <ilyailusha@hotmail.com>
 //
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 
 import Foundation
 import UIKit
 
-class SuggestionsObject {
+class SuggestionsObject: NSObject {
     
     enum Constant {
         static let spaceBetweenOverlayAndText: CGFloat = 10.0
@@ -19,14 +36,15 @@ class SuggestionsObject {
         static let textDrawingSuperviewOffset: CGFloat = 10.0
     }
     
-    private var fillLayer: SuggestionsFillLayer?
-    private var bubleLayer: SuggestionsBubleLayer?
-    private var textLayer: SuggestionsTextLayer?
-    private var blurLayer: SuggestionsBlurLayer?
-    private var unblurLayer: SuggestionsUnblurLayer?
-    private var mainView: UIView?
+    private var fillLayer: FillLayer?
+    private var bubleLayer: BubleLayer?
+    private var textLayer: TextLayer?
+    private var blurLayer: BlurLayer?
+    private var unblurLayer: UnblurLayer?
+    private var mainView: MainView?
     private var superview: UIView?
     
+    private var lastSuggested: SuggestionsManager.Suggestion?
     private var mainPath: UIBezierPath?
     private var lastHolePath: UIBezierPath?
     
@@ -73,7 +91,7 @@ class SuggestionsObject {
     
     private let defaultConfig: SuggestionsConfig = {
         let buble = SuggestionsConfig.BubleConfig(shouldDraw: true, tailHeight: 5, focusOffset: 5, cornerRadius: 10, borderWidth: 0.5, borderColor: UIColor.clear, backgroundColor: UIColor.black)
-        let text = SuggestionsConfig.TextConfig(textColor: UIColor.white, font: UIFont.systemFont(ofSize: 15, weight: .thin))
+        let text = SuggestionsConfig.TextConfig(textColor: UIColor.white, font: UIFont.systemFont(ofSize: 15, weight: .regular))
         let background = SuggestionsConfig.Background(opacity: 0.5, blurred: true, color: UIColor.black)
         
         return SuggestionsConfig(buble: buble, text: text, background: background, animationsTimingFunction: CAMediaTimingFunctionName.linear)
@@ -86,6 +104,7 @@ class SuggestionsObject {
     var viewTappedBlock: (() -> ())?
     
     init(with superview: UIView, config: SuggestionsConfig? = nil) {
+        super.init()
         configure(with: config, superview: superview)
     }
     
@@ -94,24 +113,49 @@ class SuggestionsObject {
     }
     
     func suggestionsFinished() {
+        removeObservingAtLastSuggested()
         mainView?.removeFromSuperview()
     }
     
     func updateForSuggestion(suggestion: SuggestionsManager.Suggestion?) {
         if let suggestion = suggestion {
+            startObserve(suggestion: suggestion)
             updateWithSuggestion(suggestion: suggestion)
         } else {
             suggestionsFinished()
         }
     }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        guard let suggestion = lastSuggested else { return }
+        updateForSuggestion(suggestion: suggestion)
+        blurLayer?.update(parent: layer, config: currentConfig, tempLayerClosure: { (layer) in
+
+        })
+        unblurLayer?.updateUnblur(suggestion: suggestion, holeRect: holeRect, animationDuration: holeMoveDuration)
+    }
 }
 
 private extension SuggestionsObject {
     
+    func startObserve(suggestion: SuggestionsManager.Suggestion) {
+        removeObservingAtLastSuggested()
+        lastSuggested = suggestion
+        lastSuggested?.view.addObserver(self, forKeyPath: #keyPath(UIView.center), options: [.new], context: nil)
+    }
+    
+    func removeObservingAtLastSuggested() {
+        lastSuggested?.view.removeObserver(self, forKeyPath: #keyPath(UIView.center))
+    }
+    
     func frame(of suggestion: SuggestionsManager.Suggestion) -> CGRect {
         guard let superview = mainView?.superview else { return .zero }
-        let newOrigin = suggestion.view.convert(superview.frame, to: nil).origin
-        return CGRect(x: newOrigin.x, y: newOrigin.y, width: suggestion.view.frame.width, height: suggestion.view.frame.height)
+        if mainView?.superview?.subviews.contains(suggestion.view) ?? false {
+            return suggestion.view.frame
+        } else {
+            let newOrigin = suggestion.view.convert(superview.frame, to: nil).origin
+            return CGRect(x: newOrigin.x, y: newOrigin.y, width: suggestion.view.frame.width, height: suggestion.view.frame.height)
+        }
     }
     
     func maxWidthToDrawText() -> CGFloat {
@@ -167,7 +211,7 @@ private extension SuggestionsObject {
     
     func configreDimmLayer(config: SuggestionsConfig) {
         
-        let dimm = SuggestionsFillLayer(parent: layer, config: config)
+        let dimm = FillLayer(parent: layer, config: config)
         dimm.holeMoveDurationUpdatedClosue = { [weak self] duration in
             self?.holeMoveDuration = duration
         }
@@ -186,7 +230,7 @@ private extension SuggestionsObject {
     func configureBubleLayer(config: SuggestionsConfig) -> CALayer? {
         guard currentConfig.buble.shouldDraw else { return nil }
         var tempLayer: CALayer?
-        let buble = SuggestionsBubleLayer(parent: layer, config: config, tempLayerClosure: { layer in
+        let buble = BubleLayer(parent: layer, config: config, tempLayerClosure: { layer in
             tempLayer = layer
         })
         bubleLayer = buble
@@ -196,7 +240,7 @@ private extension SuggestionsObject {
     
     func configureTextLayer(superLayer: CALayer?, config: SuggestionsConfig) {
         let bubleLayer = superLayer ?? layer
-        let textLayer = SuggestionsTextLayer(parent: bubleLayer, config: config)
+        let textLayer = TextLayer(parent: bubleLayer, config: config)
         textLayer.suggestionFrameClosue = { [weak self] suggestion in
             return self?.frame(of: suggestion) ?? .zero
         }
@@ -209,13 +253,13 @@ private extension SuggestionsObject {
     
     func configureUnblurLayer(with blur: CALayer?, config: SuggestionsConfig) {
         guard let superBlur = blur else { return }
-        unblurLayer = SuggestionsUnblurLayer(maskedLayer: superBlur, superBunds: bounds)
+        unblurLayer = UnblurLayer(maskedLayer: superBlur, superBunds: bounds)
     }
     
     func configureBlurLayer(config: SuggestionsConfig) -> CALayer? {
         guard config.background.blurred else { return nil }
         var newLayer: CALayer?
-        blurLayer = SuggestionsBlurLayer(parent: layer, config: config, tempLayerClosure: { layer in
+        blurLayer = BlurLayer(parent: layer, config: config, tempLayerClosure: { layer in
             newLayer = layer
         })
         
@@ -232,8 +276,7 @@ private extension SuggestionsObject {
     
     func configureMainView(superview: UIView) {
         self.superview = superview
-        let main = UIView(frame: superview.bounds)
-        superview.insertSubview(main, at: Int.max)
+        let main = MainView(parent: superview)
         mainView = main
     }
     
