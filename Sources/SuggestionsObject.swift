@@ -42,18 +42,16 @@ class SuggestionsObject: NSObject {
     private var blurLayer: BlurLayer?
     private var unblurLayer: UnblurLayer?
     private var mainView: MainView?
-    private var superview: UIView?
     
-    private var lastSuggested: SuggestionsManager.Suggestion?
-    private var mainPath: UIBezierPath?
-    private var lastHolePath: UIBezierPath?
-    
+    private var lastSuggested: Suggestion?
     
     private var holeRect: CGRect = .zero
     private var textLayerRect: CGRect = .zero
     private var holeMoveDuration: TimeInterval = 0
     
-    private var config: SuggestionsConfig?
+    private var shouldTouchBeCounted = true
+    
+    private let config: SuggestionsConfig
     
     private var view: UIView {
         guard let view = mainView else { preconditionFailure("") }
@@ -89,23 +87,12 @@ class SuggestionsObject: NSObject {
         }
     }
     
-    private let defaultConfig: SuggestionsConfig = {
-        let buble = SuggestionsConfig.BubleConfig(shouldDraw: true, tailHeight: 5, focusOffset: 5, cornerRadius: 10, borderWidth: 0.5, borderColor: UIColor.clear, backgroundColor: UIColor.black)
-        let text = SuggestionsConfig.TextConfig(textColor: UIColor.white, font: UIFont.systemFont(ofSize: 15, weight: .regular))
-        let background = SuggestionsConfig.Background(opacity: 0.5, blurred: true, color: UIColor.black)
-        
-        return SuggestionsConfig(buble: buble, text: text, background: background, animationsTimingFunction: CAMediaTimingFunctionName.linear)
-    }()
-    
-    private var currentConfig: SuggestionsConfig {
-        return config ?? defaultConfig
-    }
-    
     var viewTappedBlock: (() -> ())?
     
-    init(with superview: UIView, config: SuggestionsConfig? = nil) {
+    init(config: SuggestionsConfig) {
+        self.config = config
         super.init()
-        configure(with: config, superview: superview)
+        configure(with: config)
     }
     
     deinit {
@@ -113,49 +100,75 @@ class SuggestionsObject: NSObject {
     }
     
     func suggestionsFinished() {
+        mainView?.finish()
         removeObservingAtLastSuggested()
-        mainView?.removeFromSuperview()
     }
     
-    func updateForSuggestion(suggestion: SuggestionsManager.Suggestion?) {
+    func updateForSuggestion(suggestion: Suggestion?) {
         if let suggestion = suggestion {
             startObserve(suggestion: suggestion)
             updateWithSuggestion(suggestion: suggestion)
+            UIView.animate(withDuration: 1.0, animations: {
+                self.mainView?.alpha = 1.0
+            })
         } else {
+            if config.hapticEnabled {
+                if #available(iOS 10.0, *) {
+                    let generator = UINotificationFeedbackGenerator()
+                    generator.notificationOccurred(.success)
+                }
+            }
             suggestionsFinished()
         }
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        guard let suggestion = lastSuggested else { return }
-        updateForSuggestion(suggestion: suggestion)
-        blurLayer?.update(parent: layer, config: currentConfig, tempLayerClosure: { (layer) in
-
-        })
-        unblurLayer?.updateUnblur(suggestion: suggestion, holeRect: holeRect, animationDuration: holeMoveDuration)
+        performUpdateAfterBoundsChange()
     }
 }
 
 private extension SuggestionsObject {
     
-    func startObserve(suggestion: SuggestionsManager.Suggestion) {
+    func lockViewInteraction(for seconds: TimeInterval) {
+        shouldTouchBeCounted = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds) { [weak self] in
+            self?.shouldTouchBeCounted = true
+        }
+    }
+    
+    func performUpdateAfterBoundsChange() {
+        guard let suggestion = lastSuggested else { return }
+        updateForSuggestion(suggestion: suggestion)
+        blurLayer?.update(parent: layer, config: config)
+        unblurLayer?.updateUnblur(suggestion: suggestion, holeRect: holeRect, animationDuration: holeMoveDuration)
+    }
+    
+    func startObserve(suggestion: Suggestion) {
         removeObservingAtLastSuggested()
         lastSuggested = suggestion
-        lastSuggested?.view.addObserver(self, forKeyPath: #keyPath(UIView.center), options: [.new], context: nil)
+        let keyPaths = [#keyPath(UIView.bounds), #keyPath(UIView.frame), #keyPath(UIView.center)]
+        [lastSuggested?.view, lastSuggested?.view.superview, lastSuggested?.view.superview?.superview].forEach { (view) in
+            keyPaths.forEach { (keyPath) in
+                view?.addObserver(self, forKeyPath: keyPath, options: [.new], context: nil)
+            }
+        }
     }
     
     func removeObservingAtLastSuggested() {
-        lastSuggested?.view.removeObserver(self, forKeyPath: #keyPath(UIView.center))
+        let keyPaths = [#keyPath(UIView.bounds), #keyPath(UIView.frame), #keyPath(UIView.center)]
+        [lastSuggested?.view, lastSuggested?.view.superview, lastSuggested?.view.superview?.superview].forEach { (view) in
+            keyPaths.forEach { (keyPath) in
+                if view?.observationInfo != nil {
+                    view?.removeObserver(self, forKeyPath: keyPath)
+                }
+            }
+        }
     }
     
-    func frame(of suggestion: SuggestionsManager.Suggestion) -> CGRect {
+    func frame(of suggestion: Suggestion) -> CGRect {
         guard let superview = mainView?.superview else { return .zero }
-        if mainView?.superview?.subviews.contains(suggestion.view) ?? false {
-            return suggestion.view.frame
-        } else {
-            let newOrigin = suggestion.view.convert(superview.frame, to: nil).origin
-            return CGRect(x: newOrigin.x, y: newOrigin.y, width: suggestion.view.frame.width, height: suggestion.view.frame.height)
-        }
+        let newOrigin = suggestion.view.convert(superview.frame, to: nil).origin
+        return CGRect(x: newOrigin.x, y: newOrigin.y, width: suggestion.view.frame.width, height: suggestion.view.frame.height)
     }
     
     func maxWidthToDrawText() -> CGFloat {
@@ -172,23 +185,24 @@ private extension SuggestionsObject {
         }
     }
     
-    func updateText(suggestion: SuggestionsManager.Suggestion) {
+    func updateText(suggestion: Suggestion) {
         textLayer?.update(boundsForDrawing: boundsForDrawingText(), maxTextWidth: maxWidthToDrawText(), suggestion: suggestion, animationDuration: holeMoveDuration)
     }
     
-    func updateOverlay(suggestion: SuggestionsManager.Suggestion) {
-        fillLayer?.update(suggestion: suggestion)
+    func updateOverlay(suggestion: Suggestion) {
+        fillLayer?.update(suggestion: suggestion, parentBounds: layer.bounds)
     }
     
-    func updateBuble(of suggestion: SuggestionsManager.Suggestion) {
+    func updateBuble(of suggestion: Suggestion) {
         bubleLayer?.update(textRect: textLayerRect, holeRect: holeRect, suggestion: suggestion, animationDuration: holeMoveDuration)
     }
     
-    func updateUnblur(suggestion: SuggestionsManager.Suggestion) {
+    func updateUnblur(suggestion: Suggestion) {
+        unblurLayer?.update(frame: layer.frame)
         unblurLayer?.updateUnblur(suggestion: suggestion, holeRect: holeRect, animationDuration: holeMoveDuration)
     }
     
-    func updateWithSuggestion(suggestion: SuggestionsManager.Suggestion) {
+    func updateWithSuggestion(suggestion: Suggestion) {
         updateOverlay(suggestion: suggestion)
         updateText(suggestion: suggestion)
         updateBuble(of: suggestion)
@@ -196,6 +210,13 @@ private extension SuggestionsObject {
     }
     
     @objc func viewTapped() {
+        guard shouldTouchBeCounted else { return }
+        if config.hapticEnabled {
+            if #available(iOS 10.0, *) {
+                let generator = UIImpactFeedbackGenerator(style: .light)
+                generator.impactOccurred()
+            }
+        }
         viewTappedBlock?()
     }
     
@@ -214,6 +235,7 @@ private extension SuggestionsObject {
         let dimm = FillLayer(parent: layer, config: config)
         dimm.holeMoveDurationUpdatedClosue = { [weak self] duration in
             self?.holeMoveDuration = duration
+            self?.lockViewInteraction(for: duration)
         }
         
         dimm.holeRectUpdatedClosue = { [weak self] newRect in
@@ -228,7 +250,7 @@ private extension SuggestionsObject {
     }
     
     func configureBubleLayer(config: SuggestionsConfig) -> CALayer? {
-        guard currentConfig.buble.shouldDraw else { return nil }
+        guard config.buble.shouldDraw else { return nil }
         var tempLayer: CALayer?
         let buble = BubleLayer(parent: layer, config: config, tempLayerClosure: { layer in
             tempLayer = layer
@@ -253,7 +275,7 @@ private extension SuggestionsObject {
     
     func configureUnblurLayer(with blur: CALayer?, config: SuggestionsConfig) {
         guard let superBlur = blur else { return }
-        unblurLayer = UnblurLayer(maskedLayer: superBlur, superBunds: bounds)
+        unblurLayer = UnblurLayer(maskedLayer: superBlur, superBunds: bounds, config: config)
     }
     
     func configureBlurLayer(config: SuggestionsConfig) -> CALayer? {
@@ -274,17 +296,20 @@ private extension SuggestionsObject {
         configureTextLayer(superLayer: temp, config: config)
     }
     
-    func configureMainView(superview: UIView) {
-        self.superview = superview
+    func configureMainView() {
+        guard let superview = UIApplication.shared.keyWindow else { return }
         let main = MainView(parent: superview)
+        main.alpha = 0.0
+        main.mainViewResizedBlock = { [weak self] frame in
+            self?.performUpdateAfterBoundsChange()
+        }
         mainView = main
     }
     
-    func configure(with config: SuggestionsConfig?, superview: UIView) {
-        self.config = config
-        configureMainView(superview: superview)
+    func configure(with config: SuggestionsConfig) {
+        configureMainView()
         configureGestures()
         configureAppearance()
-        configureSublayers(config: currentConfig)
+        configureSublayers(config: config)
     }
 }

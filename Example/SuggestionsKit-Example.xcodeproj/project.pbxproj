@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0D5B2C23245EABA200E0BD01 /* SuggestionsKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D5B2C22245EABA200E0BD01 /* SuggestionsKit.framework */; };
+		0D11CF4C24658FB000A60B66 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D11CF4B24658FB000A60B66 /* UIView+Extension.swift */; };
+		0D50404A2460761C00A9D5E4 /* SuggestionsKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D5B2C22245EABA200E0BD01 /* SuggestionsKit.framework */; };
+		0D50404B2460761C00A9D5E4 /* SuggestionsKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0D5B2C22245EABA200E0BD01 /* SuggestionsKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0D85512A246475FB005DF06F /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D855129246475FB005DF06F /* TableViewController.swift */; };
 		0D89E89D2456F89F0083B808 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D89E89C2456F89F0083B808 /* AppDelegate.swift */; };
 		0D89E89F2456F89F0083B808 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D89E89E2456F89F0083B808 /* SceneDelegate.swift */; };
 		0D89E8A12456F89F0083B808 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D89E8A02456F89F0083B808 /* ViewController.swift */; };
@@ -16,8 +19,24 @@
 		0D89E8A92456F89F0083B808 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0D89E8A72456F89F0083B808 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		0D50404C2460761C00A9D5E4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0D50404B2460761C00A9D5E4 /* SuggestionsKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		0D11CF4B24658FB000A60B66 /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		0D5B2C22245EABA200E0BD01 /* SuggestionsKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SuggestionsKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0D855129246475FB005DF06F /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		0D89E8992456F89F0083B808 /* SuggestionsKit-Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SuggestionsKit-Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0D89E89C2456F89F0083B808 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0D89E89E2456F89F0083B808 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -33,7 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0D5B2C23245EABA200E0BD01 /* SuggestionsKit.framework in Frameworks */,
+				0D50404A2460761C00A9D5E4 /* SuggestionsKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,6 +82,8 @@
 				0D89E89C2456F89F0083B808 /* AppDelegate.swift */,
 				0D89E89E2456F89F0083B808 /* SceneDelegate.swift */,
 				0D89E8A02456F89F0083B808 /* ViewController.swift */,
+				0D855129246475FB005DF06F /* TableViewController.swift */,
+				0D11CF4B24658FB000A60B66 /* UIView+Extension.swift */,
 				0D89E8A22456F89F0083B808 /* Main.storyboard */,
 				0D89E8A52456F89F0083B808 /* Assets.xcassets */,
 				0D89E8A72456F89F0083B808 /* LaunchScreen.storyboard */,
@@ -89,6 +110,7 @@
 				0D89E8952456F89F0083B808 /* Sources */,
 				0D89E8962456F89F0083B808 /* Frameworks */,
 				0D89E8972456F89F0083B808 /* Resources */,
+				0D50404C2460761C00A9D5E4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -153,6 +175,8 @@
 				0D89E8A12456F89F0083B808 /* ViewController.swift in Sources */,
 				0D89E89D2456F89F0083B808 /* AppDelegate.swift in Sources */,
 				0D89E89F2456F89F0083B808 /* SceneDelegate.swift in Sources */,
+				0D11CF4C24658FB000A60B66 /* UIView+Extension.swift in Sources */,
+				0D85512A246475FB005DF06F /* TableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

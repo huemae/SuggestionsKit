@@ -28,45 +28,48 @@ import SuggestionsKit
 
 class ViewController: UIViewController {
     
+    @IBOutlet weak var sendMessageButton: UIButton!
+    @IBOutlet weak var shareButton: UIButton!
+    @IBOutlet weak var infoLabel: UILabel!
+    @IBOutlet weak var winkButton: UIButton!
+    @IBOutlet weak var blockUser: UIButton!
     
-    @IBOutlet var allViews: [UIView]!
-    var manager: SuggestionsManager?
+    
+    var titleText: String = ""
+    var tabBarTest: Bool = false
+    var config: SuggestionsConfig = SuggestionsConfig()
+    
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewDidAppear(_ animated: Bool) {
+         showSuggestions()
+    }
+    
+    @IBAction func refreshButtonPressed(_ sender: Any) {
         showSuggestions()
     }
     
     func showSuggestions() {
-        let subviews = allViews.sorted(by: { $0.frame.origin.y < $1.frame.origin.y })
-        let suggestions = subviews.compactMap { ($0, self.textForComponent(view: $0)) }
-        manager = SuggestionsManager(with: suggestions, mainView: view, config: nil)
-        manager?.startShowing()
-    }
-    
-    func randomString(length: Int) -> String {
-        let letters = "abcdefg hijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        return String((0..<length).map{ _ in letters.randomElement()! })
-    }
-    
-    func textForComponent(view: UIView) -> String {
-        switch view {
-            case view as? UITextField:
-                return "Сюда вы можете ввести текст"
-            case view as? UIStepper:
-                return "Можно увеличивать и уменьшать значения"
-            case view as? UIButton:
-                return "Это кнопка. На нее можно нажимать и получать разный результат!"
-            case view as? UISwitch:
-                return "Обычный переключатель"
-            case view as? UIActivityIndicatorView:
-                return "Индикатор загрузки. Нужно подождать..."
-            case view as? UIProgressView:
-                return "Индикатор прогресса чего угодно."
-            default:
-                return randomString(length: 44)
+        var suggestions: [Suggestion] = []
+        if tabBarTest {
+            let bottomSuggestions = SuggestionsHelper.createSuggestionsFromBarItems(items: tabBarController?.tabBar.items) { index in
+                return "Also supports tab bar items \(index)"
+            }
+            suggestions = bottomSuggestions
+        } else {
+            let rightSuggestions = SuggestionsHelper.createSuggestionsFromBarItems(items: navigationItem.rightBarButtonItems) { index in
+                return "Tap here to restart suggestions\n(navigation items support)"
+            }
+            let sendSuggestion = Suggestion(view: sendMessageButton, text: "Tap here to send message to user")
+            let shareSuggestion = Suggestion(view: shareButton, text: "Tap here to share users profile")
+            let infoSuggestion = Suggestion(view: infoLabel, text: "Small info about user")
+            let winkSuggestion = Suggestion(view: winkButton, text: "You also can wink to show what you are interested in a person")
+            let blockSuggestion = Suggestion(view: blockUser, text: "Or block the user if he is obsessive")
+            
+            suggestions = rightSuggestions + [sendSuggestion, shareSuggestion, infoSuggestion, winkSuggestion, blockSuggestion]
         }
+        
+        SuggestionsManager.apply(suggestions)
+            .configre(config)
+            .startShowing()
     }
-
 }
-
