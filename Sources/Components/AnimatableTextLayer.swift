@@ -1,8 +1,8 @@
 //
-//  MainView.swift
+//  AnimatableTextLayer.swift
 //  SuggestionsKit
 //
-//  Created by huemae on 12.04.2020.
+//  Created by huemae on 06.05.2020.
 //  Copyright (c) 2020 huemae <ilyailusha@hotmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,43 +27,41 @@ import Foundation
 import UIKit
 
 
-class MainView: UIView {
+class AnimatableTextLayer: CATextLayer {
     
-    override class var layerClass: AnyClass {
-        return MainViewLayer.self
+    private var config: SuggestionsConfig?
+    private var animationDuration: TimeInterval = 0
+    
+    init(with config: SuggestionsConfig) {
+        let layer = CATextLayer()
+        self.config = config
+        super.init(layer: layer)
     }
     
-    init(parent: UIView) {
-        super.init(frame: parent.bounds)
-        commonInit(parent: parent)
+    override init(layer: Any) {
+        super.init(layer: layer)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    func updateNextAnimationDuration(duration: TimeInterval) {
+        animationDuration = duration
     }
     
-    override func layoutSublayers(of layer: CALayer) {
-        super.layoutSublayers(of: layer)
-    }
-}
-
-private extension MainView {
     
-    func configureConstraints(parent: UIView) {
+    override func add(_ anim: CAAnimation, forKey key: String?) {
+        super.add(anim, forKey: key)
+    }
+    
+    override func action(forKey event: String) -> CAAction? {
+        let curAnim = super.action(forKey: event) as? CAAnimation
+        guard let anim = curAnim?.mutableCopy() as? CAAnimation else { return nil }
+        anim.timingFunction = CAMediaTimingFunction(name: config?.animationsTimingFunction ?? CAMediaTimingFunctionName.linear)
+        anim.duration = animationDuration
+        anim.fillMode = .forwards
         
-        topAnchor.constraint(equalTo: parent.topAnchor).isActive = true
-        leadingAnchor.constraint(equalTo: parent.leadingAnchor).isActive = true
-        trailingAnchor.constraint(equalTo: parent.trailingAnchor).isActive = true
-        bottomAnchor.constraint(equalTo: parent.bottomAnchor).isActive = true
-    }
-    
-    func commonInit(parent: UIView) {
-        translatesAutoresizingMaskIntoConstraints = false
-        parent.insertSubview(self, at: Int.max)
-        configureConstraints(parent: parent)
+        return anim
     }
 }

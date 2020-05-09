@@ -30,45 +30,43 @@ import UIKit
 class UnblurLayer {
     
     private let layer = CAShapeLayer()
+    private let config: SuggestionsConfig
     
-    init(maskedLayer: CALayer, superBunds: CGRect) {
+    init(maskedLayer: CALayer, superBunds: CGRect, config: SuggestionsConfig) {
+        self.config = config
         commonInit(maskedLayer: maskedLayer, superBunds: superBunds)
     }
     
-    func updateUnblur(suggestion: SuggestionsManager.Suggestion, holeRect: CGRect, animationDuration: TimeInterval) {
+    func update(frame: CGRect) {
+        layer.frame = frame
+    }
+    
+    func updateUnblur(suggestion: Suggestion, holeRect: CGRect, animationDuration: TimeInterval) {
         let biggerRect = CGRect(x: layer.frame.origin.x, y: layer.frame.origin.y, width: layer.frame.size.width, height: layer.frame.size.height)
         let smallerRect = holeRect
-
-        let maskPath = UIBezierPath()
-        maskPath.move(to: CGPoint(x: biggerRect.minX, y: biggerRect.minY))
-        maskPath.addLine(to: CGPoint(x: biggerRect.minX, y: biggerRect.maxY))
-        maskPath.addLine(to: CGPoint(x: biggerRect.maxX, y: biggerRect.maxY))
-        maskPath.addLine(to: CGPoint(x: biggerRect.maxX, y: biggerRect.minY))
-        maskPath.addLine(to: CGPoint(x: biggerRect.minX, y: biggerRect.minY))
-
-        maskPath.move(to: CGPoint(x: smallerRect.minX, y: smallerRect.minY))
-        maskPath.addLine(to: CGPoint(x: smallerRect.minX, y: smallerRect.maxY))
-        maskPath.addLine(to: CGPoint(x: smallerRect.maxX, y: smallerRect.maxY))
-        maskPath.addLine(to: CGPoint(x: smallerRect.maxX, y: smallerRect.minY))
-        maskPath.addLine(to: CGPoint(x: smallerRect.minX, y: smallerRect.minY))
         
-        let pathAnimation = CABasicAnimation(keyPath: "path")
-        pathAnimation.fromValue = layer.path
-        pathAnimation.toValue = maskPath.cgPath
+        let finalRadius: CGFloat = {
+            let sugRadius = suggestion.view.layer.cornerRadius
+            if sugRadius > 0 {
+                if sugRadius == suggestion.view.frame.size.height / 2 {
+                    return holeRect.width / 2
+                }
+                return sugRadius
+            }
+            
+            return SuggestionsObject.Constant.minimalCornerRadius
+        }()
+
+        let maskPath = UIBezierPath(roundedRect: biggerRect, cornerRadius: 0)
+        maskPath.append(UIBezierPath(roundedRect: smallerRect, cornerRadius: finalRadius))
         
-        let groupAnimation = CAAnimationGroup()
-        groupAnimation.animations = [pathAnimation]
-        groupAnimation.fillMode = .forwards
-        groupAnimation.duration = animationDuration
-        groupAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        groupAnimation.isRemovedOnCompletion = true
-        CATransaction.begin()
-        CATransaction.setCompletionBlock { [weak self] in
-            self?.layer.removeAnimation(forKey: "path")
-        }
-        layer.add(groupAnimation, forKey: "groupAnimation")
-        layer.path = maskPath.cgPath
-        CATransaction.commit()
+        let animations: [AnimationInfo] = [
+            .init(key: #keyPath(CAShapeLayer.path), fromValue: layer.path, toValue: maskPath.cgPath)
+        ]
+        
+        layer.perfrormAnimation(items: animations, timing: config.animationsTimingFunction, duration: animationDuration, fillMode: .forwards, changeValuesClosure: { [weak self] in
+            self?.layer.path = maskPath.cgPath
+        })
     }
 }
 
@@ -80,6 +78,7 @@ private extension UnblurLayer {
         layer.frame = superBunds
         layer.fillRule = .evenOdd
         layer.name = String(describing: self)
+        
         maskedLayer.mask = layer
     }
 }

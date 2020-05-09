@@ -28,52 +28,69 @@ import UIKit
 
 class FillLayer {
     
-    var suggestionFrameClosue: ((SuggestionsManager.Suggestion) -> CGRect)?
+    var suggestionFrameClosue: ((Suggestion) -> CGRect)?
     var holeRectUpdatedClosue: ((CGRect) -> ())?
     var holeMoveDurationUpdatedClosue: ((TimeInterval) -> ())?
     
     private let layer = CAShapeLayer()
-    private let mainPath: UIBezierPath
+    private var mainPath: UIBezierPath = UIBezierPath()
     private var lastHolePath: UIBezierPath?
     private var holeRect: CGRect = .zero
     private var animationDuration: TimeInterval = 0
+    private let config: SuggestionsConfig
     
     init(parent: CALayer, config: SuggestionsConfig) {
-        mainPath = UIBezierPath(rect: parent.bounds)
+        self.config = config
         commonInit(parent: parent, config: config)
+        recreateMainPath(parentBounds: parent.bounds)
     }
     
-    func update(suggestion: SuggestionsManager.Suggestion) {
+    func update(suggestion: Suggestion, parentBounds: CGRect) {
+        recreateMainPath(parentBounds: parentBounds)
         internalUpdate(suggestion: suggestion)
     }
 }
 
 private extension FillLayer {
     
-    func internalUpdate(suggestion: SuggestionsManager.Suggestion) {
+    func recreateMainPath(parentBounds: CGRect) {
+        let newMainPath = UIBezierPath(rect: .init(origin: .zero, size: .init(width: 10000, height: 10000)))
+        mainPath = newMainPath
+    }
+    
+    func internalUpdate(suggestion: Suggestion) {
         layer.path = mainPath.cgPath
         let sugFrame = suggestionFrameClosue?(suggestion) ?? .zero
         let width = sugFrame.width + SuggestionsObject.Constant.holeOverdrawAmount
         let height = sugFrame.height + SuggestionsObject.Constant.holeOverdrawAmount
         
-        let finalRadius = SuggestionsObject.Constant.minimalCornerRadius
+        let halfOverdraw = SuggestionsObject.Constant.holeOverdrawAmount / 2
+        
+        holeRect = CGRect(x: sugFrame.origin.x - halfOverdraw, y: sugFrame.origin.y - halfOverdraw, width: width, height: height)
+        
+        let finalRadius: CGFloat = {
+            let sugRadius = suggestion.view.layer.cornerRadius
+            if sugRadius > 0 {
+                if sugRadius == sugFrame.size.height / 2 {
+                    return holeRect.width / 2
+                }
+                return sugRadius
+            }
+            
+            return SuggestionsObject.Constant.minimalCornerRadius
+        }()
         
         let fakeNewPath = mainPath.copy() as? UIBezierPath ?? UIBezierPath()
         
         if let lastPath = lastHolePath {
             fakeNewPath.append(lastPath)
         } else {
-            let space = SuggestionsObject.Constant.spaceBetweenOverlayAndText
-            let frame = layer.frame
-            let fakePath = UIBezierPath(roundedRect: CGRect(x: frame.midX - space, y: frame.midY - space, width: space * 2, height: space * 2), cornerRadius: space)
+            let fakePath = UIBezierPath(roundedRect: holeRect, cornerRadius: finalRadius)
             fakeNewPath.append(fakePath)
         }
-        
-        let halfOverdraw = SuggestionsObject.Constant.holeOverdrawAmount / 2
-        
-        holeRect = CGRect(x: sugFrame.origin.x - halfOverdraw, y: sugFrame.origin.y - halfOverdraw, width: width, height: height)
+
         holeRectUpdatedClosue?(holeRect)
-        let circlePath = UIBezierPath(roundedRect: self.holeRect, cornerRadius: finalRadius)
+        let circlePath = UIBezierPath(roundedRect: holeRect, cornerRadius: finalRadius)
         self.lastHolePath = circlePath
         let newPath = mainPath.copy() as? UIBezierPath ?? UIBezierPath()
         newPath.append(circlePath)
@@ -81,21 +98,13 @@ private extension FillLayer {
         animationDuration = calculateDuration(distance: CGPointDistance(from: fakeNewPath.currentPoint, to: newPath.currentPoint))
         holeMoveDurationUpdatedClosue?(animationDuration)
         
-        let pathAnimation = CAKeyframeAnimation(keyPath: "path")
-        pathAnimation.values = [fakeNewPath.cgPath, newPath.cgPath]
-        pathAnimation.keyTimes = [0, 1]
-        pathAnimation.duration = animationDuration
-        pathAnimation.isRemovedOnCompletion = true
-        pathAnimation.repeatCount = 1
-        pathAnimation.fillMode = .forwards
-        pathAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        CATransaction.begin()
-        CATransaction.setCompletionBlock { [weak self] in
-            self?.layer.removeAnimation(forKey: "path")
-        }
-        layer.add(pathAnimation, forKey: "pathAnimation")
-        CATransaction.commit()
-        layer.path = newPath.cgPath
+        let animations: [AnimationInfo] = [
+            .init(key: #keyPath(CAShapeLayer.path), fromValue: fakeNewPath.cgPath, toValue: newPath.cgPath)
+        ]
+        
+        layer.perfrormAnimation(items: animations, timing: config.animationsTimingFunction, duration: animationDuration, fillMode: .forwards, changeValuesClosure: { [weak self] in
+            self?.layer.path = newPath.cgPath
+        })
     }
     
     func CGPointDistanceSquared(from: CGPoint, to: CGPoint) -> CGFloat {
@@ -107,11 +116,12 @@ private extension FillLayer {
     }
     
     func calculateDuration(distance: CGFloat) -> Double {
-        let pointsPerSecond: Double = 800.0
-        let time = Double(distance) / pointsPerSecond
-        let calculatedTime = Double(time)
+//        let pointsPerSecond: Double = 600.0
+//        let time = Double(distance) / pointsPerSecond
+//        let calculatedTime = Double(time)
+//        print("calculated time = \(calculatedTime)")
         
-        return calculatedTime
+        return 0.5
     }
     
     func commonInit(parent: CALayer, config: SuggestionsConfig) {

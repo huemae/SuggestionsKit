@@ -30,8 +30,13 @@ import UIKit
 /// Configuration that will be applied to all suggestions shown by this manager
 public struct SuggestionsConfig {
     
+    public enum PreferredTextAppearance {
+        case under
+        case above
+    }
+    
     /// Configuration of buble
-    struct BubleConfig {
+    public struct BubleConfig {
         /// If this property changed to false buble of suggestion will not be shown at all
         let shouldDraw: Bool
         /// Distance between body of buble and top
@@ -46,24 +51,48 @@ public struct SuggestionsConfig {
         let borderColor: UIColor
         /// Buble background color
         let backgroundColor: UIColor
+        
+        public init(shouldDraw: Bool = true, tailHeight: CGFloat = 4, focusOffset: CGFloat = 4, cornerRadius: CGFloat = 10, borderWidth: CGFloat = 0.5, borderColor: UIColor = UIColor.clear, backgroundColor: UIColor = UIColor.white) {
+            self.shouldDraw = shouldDraw
+            self.tailHeight = tailHeight
+            self.focusOffset = focusOffset
+            self.cornerRadius = cornerRadius
+            self.borderWidth = borderWidth
+            self.borderColor = borderColor
+            self.backgroundColor = backgroundColor
+        }
     }
     
     /// Configuration of displayed text
-    struct TextConfig {
+    public struct TextConfig {
         /// Color of suggestion's text
         let textColor: UIColor
         /// Font of suggestion's text
         let font: UIFont
+        /// Offset between text and hole
+        let holeOffset: CGFloat
+        
+        public init(textColor: UIColor = UIColor.black, font: UIFont = UIFont.systemFont(ofSize: 14), holeOffset: CGFloat = 8) {
+            self.textColor = textColor
+            self.font = font
+            self.holeOffset = holeOffset
+        }
     }
     
-    /// Configuration of background added above 'mainView'
-    struct Background {
+    /// Configuration of background added above all suggestions
+    public struct Background {
         /// Opacity of background
         let opacity: CGFloat
         /// If this property changed to false background will not be blurred
         let blurred: Bool
         /// Color of background
         let color: UIColor
+        
+        public init(opacity: CGFloat = 0.5, blurred: Bool = true, color: UIColor = UIColor.black) {
+            self.opacity = opacity
+            self.blurred = blurred
+            self.color = color
+        }
     }
     
     let buble: BubleConfig
@@ -71,4 +100,19 @@ public struct SuggestionsConfig {
     let background: Background
     /// Animation timing function
     let animationsTimingFunction: CAMediaTimingFunctionName
+    /// Preferred text appearance. Text will appear under suggestion item if set this property to 'under'
+    let preferredTextAppearance: PreferredTextAppearance
+    /// If true text and buble will bounce around suggestion item
+    let shouldBounceAfterMove: Bool
+    let hapticEnabled: Bool
+    
+    public init(buble: BubleConfig = BubleConfig(), text: TextConfig = TextConfig(), background: Background = Background(), animationsTimingFunction: CAMediaTimingFunctionName = .default, preferredTextAppearance: PreferredTextAppearance = .above, shouldBounceAfterMove: Bool = true, hapticEnabled: Bool = true) {
+        self.buble = buble
+        self.text = text
+        self.background = background
+        self.animationsTimingFunction = animationsTimingFunction
+        self.preferredTextAppearance = preferredTextAppearance
+        self.shouldBounceAfterMove = shouldBounceAfterMove
+        self.hapticEnabled = true
+    }
 }

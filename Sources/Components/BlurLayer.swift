@@ -29,6 +29,10 @@ import UIKit
 
 class BlurLayer {
     
+    private enum Constant {
+        static let blurRadius: Float = 5
+    }
+    
     private var layer: CAShapeLayer = CAShapeLayer()
     
     init(parent: CALayer, config: SuggestionsConfig, tempLayerClosure: (CALayer) -> ()) {
@@ -36,9 +40,8 @@ class BlurLayer {
         tempLayerClosure(layer)
     }
     
-    func update(parent: CALayer, config: SuggestionsConfig, tempLayerClosure: (CALayer) -> ()) {
-        commonInit(parent: parent, config: config)
-        tempLayerClosure(layer)
+    func update(parent: CALayer, config: SuggestionsConfig) {
+        commonInit(parent: parent, config: config, update: true)
     }
 }
 
@@ -48,38 +51,43 @@ private extension BlurLayer {
         let context: CIContext = CIContext(options: nil)
         guard let cgImage: CGImage = context.createCGImage(cmage, from: cmage.extent) else { return nil }
         
-        return cgImage
+        let cgBlurRadius = CGFloat(Constant.blurRadius)
+        return cgImage.cropping(to: .init(x: cgBlurRadius * 3, y: cgBlurRadius * 3, width: layer.bounds.width * UIScreen.main.scale, height: layer.bounds.height * UIScreen.main.scale ))
     }
     
     func renderBackgroundImage(parent: CALayer) -> CGImage? {
-        let mainViewLayer = parent.superlayer?.sublayers?.filter { $0 is MainViewLayer }.first
-        let hiddenState = mainViewLayer?.isHidden ?? false
+        let hiddenState = parent.isHidden
         
         defer {
-            mainViewLayer?.isHidden = hiddenState
+            parent.isHidden = hiddenState
         }
-        mainViewLayer?.isHidden = true
+        parent.isHidden = true
         
-        UIGraphicsBeginImageContextWithOptions(parent.bounds.size, false, UIScreen.main.scale)
-        guard let context = UIGraphicsGetCurrentContext() else { return nil }
-        parent.superlayer?.render(in: context)
-        guard let image = UIGraphicsGetImageFromCurrentImageContext()?.cgImage else { return nil }
-        UIGraphicsEndImageContext()
+        guard let image = UIApplication.shared.keyWindow?.snapshot()?.cgImage else { return nil }
 
         let imageToBlur: CIImage? = CIImage(cgImage: image)
         let gaussianBlurFilter = CIFilter(name: "CIGaussianBlur")
         gaussianBlurFilter?.setValue(imageToBlur, forKey: "inputImage")
-        gaussianBlurFilter?.setValue(NSNumber(value: 5), forKey: "inputRadius")
-        let resultImage = gaussianBlurFilter?.value(forKey: "outputImage") as? CIImage
+        gaussianBlurFilter?.setValue(NSNumber(value: Constant.blurRadius), forKey: "inputRadius")
+        guard let resultImage = gaussianBlurFilter?.value(forKey: "outputImage") as? CIImage else { return nil }
         
-        guard let result = resultImage else { return nil}
-        
-        return convert(cmage: result)
+        return convert(cmage: resultImage)
     }
     
-    func commonInit(parent: CALayer, config: SuggestionsConfig) {
+    func commonInit(parent: CALayer, config: SuggestionsConfig, update: Bool = false) {
         layer.isGeometryFlipped = true
-        layer.contents = renderBackgroundImage(parent: parent)
+        layer.contents = nil
+        OperationQueue.main.cancelAllOperations()
+        OperationQueue.main.addOperation { [weak self] in
+            guard let strongSelf = self else { return }
+            let rendered = strongSelf.renderBackgroundImage(parent: parent)
+            strongSelf.layer.opacity = 0.0
+            strongSelf.layer.contents = rendered
+            let animations = [AnimationInfo(key: "opacity", fromValue: 0, toValue: 1)]
+            strongSelf.layer.perfrormAnimation(items: animations, timing: config.animationsTimingFunction, duration: 0.2, fillMode: .forwards, changeValuesClosure: {
+                strongSelf.layer.opacity = 1.0
+            })
+        }
         layer.frame = parent.bounds
         layer.contentsGravity = .resizeAspectFill
         layer.contentsScale = UIScreen.main.scale
@@ -89,3 +97,6 @@ private extension BlurLayer {
         parent.insertSublayer(layer, at: 1)
     }
 }
+
+
+

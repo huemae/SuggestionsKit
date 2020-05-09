@@ -30,29 +30,42 @@ import UIKit
 /// Manager that present interface to show suggestions
 final public class SuggestionsManager {
     
-    public typealias Suggestion = (view: UIView, text: String)
+    private static let shared = SuggestionsManager()
     
-    private var suggestions: [Suggestion]
-    
+    private var suggestions: [Suggestion] = []
     private var suggestionsOverlay: SuggestionsObject?
     
-    
-    /// This method presents initialization for SuggestionsManager
+    private init() { }
+
+    /// This method presents configuration for SuggestionsManager
     /// - Parameters:
     ///   - suggestions: Array of suggestions that you want to show to the user
-    ///   - mainView: View that contains suggestions
     ///   - config: Configuration that will be applied to all suggestions shown by this manager
-    public init(with suggestions: [Suggestion], mainView: UIView, config: SuggestionsConfig?) {
-        self.suggestions = suggestions
-        start(with: mainView, config: config)
+    public static func apply(_ suggestions: [Suggestion]) -> SuggestionsManager.Type {
+        shared.suggestionsOverlay?.suggestionsFinished()
+        shared.suggestions = suggestions.filter { $0.view.superview != nil }
+        
+        return SuggestionsManager.self
+    }
+    
+    public static func configre(_ config: SuggestionsConfig = SuggestionsConfig()) -> SuggestionsManager.Type {
+        shared.start(config: config)
+        
+        return SuggestionsManager.self
     }
     
     /// Call this method to start presentation of suggestions
-    public func startShowing() {
-        updateSuggestion()
+    public static func startShowing() {
+        shared.updateSuggestion()
+    }
+    
+    /// Call this method to stop presentation of suggestions
+    public static func stopShowing() {
+        shared.suggestionsOverlay?.suggestionsFinished()
     }
     
     deinit {
+        suggestionsOverlay?.suggestionsFinished()
         print("\(String(describing: self)) \(#function)")
     }
 }
@@ -62,18 +75,21 @@ private extension SuggestionsManager {
     func updateSuggestion() {
         guard let sug = suggestions.first else {
             suggestionsOverlay?.updateForSuggestion(suggestion: nil)
-            suggestionsOverlay = nil
+            suggestionsOverlay?.suggestionsFinished()
             return
         }
         suggestionsOverlay?.updateForSuggestion(suggestion: sug)
     }
     
-    func start(with main: UIView, config: SuggestionsConfig?) {
-        suggestionsOverlay = SuggestionsObject(with: main, config: config)
+    func start(config: SuggestionsConfig) {
+        suggestionsOverlay = SuggestionsObject(config: config)
         
         suggestionsOverlay?.viewTappedBlock = { [weak self] in
-            self?.suggestions.removeFirst()
-            self?.updateSuggestion()
+            guard let strongSelf = self else { return }
+            if !strongSelf.suggestions.isEmpty {
+                strongSelf.suggestions.removeFirst()
+                strongSelf.updateSuggestion()
+            }
         }
     }
 }
