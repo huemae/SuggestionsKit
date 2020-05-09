@@ -1,6 +1,6 @@
 # SuggestionsKit
 
-![SuggestionsKit](https://i.imgur.com/Z7WMGVk.gif)
+![SuggestionsKit](https://i.imgur.com/Z9SfxiO.gif)
 
 [![CI Status](https://img.shields.io/travis/huemae/SuggestionsKit.svg?style=flat)](https://travis-ci.org/huemae/SuggestionsKit)
 [![Version](https://img.shields.io/cocoapods/v/SuggestionsKit.svg?style=flat)](https://cocoapods.org/pods/SuggestionsKit)
