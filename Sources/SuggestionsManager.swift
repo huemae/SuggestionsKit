@@ -63,11 +63,6 @@ final public class SuggestionsManager {
     public static func stopShowing() {
         shared.suggestionsOverlay?.suggestionsFinished()
     }
-    
-    deinit {
-        suggestionsOverlay?.suggestionsFinished()
-        print("\(String(describing: self)) \(#function)")
-    }
 }
 
 private extension SuggestionsManager {

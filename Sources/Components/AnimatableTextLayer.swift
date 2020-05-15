@@ -29,7 +29,7 @@ import UIKit
 
 class AnimatableTextLayer: CATextLayer {
     
-    private var config: SuggestionsConfig?
+    private var config: SuggestionsConfig
     private var animationDuration: TimeInterval = 0
     
     init(with config: SuggestionsConfig) {
@@ -39,6 +39,7 @@ class AnimatableTextLayer: CATextLayer {
     }
     
     override init(layer: Any) {
+        self.config = SuggestionsConfig()
         super.init(layer: layer)
     }
     
@@ -58,7 +59,7 @@ class AnimatableTextLayer: CATextLayer {
     override func action(forKey event: String) -> CAAction? {
         let curAnim = super.action(forKey: event) as? CAAnimation
         guard let anim = curAnim?.mutableCopy() as? CAAnimation else { return nil }
-        anim.timingFunction = CAMediaTimingFunction(name: config?.animationsTimingFunction ?? CAMediaTimingFunctionName.linear)
+        anim.timingFunction = CAMediaTimingFunction(name: config.animationsTimingFunction)
         anim.duration = animationDuration
         anim.fillMode = .forwards
         
