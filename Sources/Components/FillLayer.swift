@@ -61,6 +61,7 @@ private extension FillLayer {
     func internalUpdate(suggestion: Suggestion) {
         layer.path = mainPath.cgPath
         let sugFrame = suggestionFrameClosue?(suggestion) ?? .zero
+        print("new frame = \(sugFrame)")
         let width = sugFrame.width + SuggestionsObject.Constant.holeOverdrawAmount
         let height = sugFrame.height + SuggestionsObject.Constant.holeOverdrawAmount
         

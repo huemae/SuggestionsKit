@@ -57,7 +57,7 @@ private extension TextLayer {
         
         let isRight = suggFrame.midX > boundsForDrawing.width / 2
         layer.bounds = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
-        layer.alignmentMode = isRight ? CATextLayerAlignmentMode.right : CATextLayerAlignmentMode.left
+        let newAlignment = isRight ? CATextLayerAlignmentMode.right : CATextLayerAlignmentMode.left
         
         
         let boundsToDraw: CGRect = boundsForDrawing
@@ -100,9 +100,9 @@ private extension TextLayer {
         let prefAppearance = config.preferredTextAppearance
         
         if prefAppearance == .above {
-            newFrame.origin.y = yPositionAbove > boundsToDraw.minY ? yPositionAbove : yPositionUnder
+            newFrame.origin.y = yPositionAbove - newSize.height > boundsToDraw.minY ? yPositionAbove : yPositionUnder
         } else if prefAppearance == .under {
-            newFrame.origin.y = yPositionUnder < boundsToDraw.maxY ? yPositionUnder : yPositionAbove
+            newFrame.origin.y = yPositionUnder + newSize.height < boundsToDraw.maxY ? yPositionUnder : yPositionAbove
         }
         newFrame.origin.x = xPosition
         
@@ -122,13 +122,15 @@ private extension TextLayer {
         
         let animations: [AnimationInfo] = [
             .init(key: #keyPath(CATextLayer.position), fromValue: fromPosition, toValue: finalPosition),
-            .init(key: #keyPath(CATextLayer.frame), fromValue: NSValue(cgRect: oldBounds), toValue: NSValue(cgRect: newBounds))
+            .init(key: #keyPath(CATextLayer.frame), fromValue: NSValue(cgRect: oldBounds), toValue: NSValue(cgRect: newBounds)),
+            .init(key: #keyPath(CATextLayer.alignmentMode), fromValue: layer.alignmentMode.rawValue, toValue: newAlignment.rawValue)
         ]
         
         layer.perfrormAnimation(items: animations, timing: config.animationsTimingFunction, duration: animationDuration, fillMode: .forwards, changeValuesClosure: { [weak self] in
             self?.layer.frame = newBounds
             self?.layer.position = finalPoint
             self?.layer.string = newString
+            self?.layer.alignmentMode = newAlignment
         })
         textLayerUpdatedFrameClosue?(newFrame)
         
@@ -155,7 +157,7 @@ private extension TextLayer {
         
         layer.contentsScale = UIScreen.main.scale
         layer.isWrapped = true
-        layer.truncationMode = .middle
+        layer.truncationMode = .none
         layer.name = String(describing: self)
         layer.masksToBounds = true
         

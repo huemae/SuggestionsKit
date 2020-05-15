@@ -123,7 +123,9 @@ class SuggestionsObject: NSObject {
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        performUpdateAfterBoundsChange()
+//        print((object as? NSObject)?.classForCoder ?? "", change?[NSKeyValueChangeKey.newKey] ?? "", keyPath)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(performUpdateAfterBoundsChange), object: nil)
+        perform(#selector(performUpdateAfterBoundsChange), with: nil, afterDelay: 0)
     }
 }
 
@@ -136,7 +138,7 @@ private extension SuggestionsObject {
         }
     }
     
-    func performUpdateAfterBoundsChange() {
+    @objc func performUpdateAfterBoundsChange() {
         guard let suggestion = lastSuggested else { return }
         updateForSuggestion(suggestion: suggestion)
         blurLayer?.update(parent: layer, config: config)
@@ -147,19 +149,39 @@ private extension SuggestionsObject {
         removeObservingAtLastSuggested()
         lastSuggested = suggestion
         let keyPaths = [#keyPath(UIView.bounds), #keyPath(UIView.frame), #keyPath(UIView.center)]
-        [lastSuggested?.view, lastSuggested?.view.superview, lastSuggested?.view.superview?.superview].forEach { (view) in
-            keyPaths.forEach { (keyPath) in
-                view?.addObserver(self, forKeyPath: keyPath, options: [.new], context: nil)
+//        [lastSuggested?.view, lastSuggested?.view.superview].forEach { (view) in
+//            keyPaths.forEach { (keyPath) in
+//                view?.addObserver(self, forKeyPath: keyPath, options: [.new], context: nil)
+//            }
+//        }
+        
+        let layerKeyPaths = [#keyPath(CALayer.bounds), #keyPath(CALayer.frame), #keyPath(CALayer.position)]
+        [lastSuggested?.view].forEach { (view) in
+            layerKeyPaths.forEach { (keyPath) in
+                view?.layer.addObserver(self, forKeyPath: keyPath, options: [.new], context: nil)
+                view?.layer.superlayer?.addObserver(self, forKeyPath: keyPath, options: [.new], context: nil)
             }
         }
     }
     
     func removeObservingAtLastSuggested() {
         let keyPaths = [#keyPath(UIView.bounds), #keyPath(UIView.frame), #keyPath(UIView.center)]
-        [lastSuggested?.view, lastSuggested?.view.superview, lastSuggested?.view.superview?.superview].forEach { (view) in
-            keyPaths.forEach { (keyPath) in
-                if view?.observationInfo != nil {
-                    view?.removeObserver(self, forKeyPath: keyPath)
+//        [lastSuggested?.view, lastSuggested?.view.superview].forEach { (view) in
+//            keyPaths.forEach { (keyPath) in
+//                if view?.observationInfo != nil {
+//                    view?.removeObserver(self, forKeyPath: keyPath)
+//                }
+//            }
+//        }
+        
+        let layerKeyPaths = [#keyPath(CALayer.bounds), #keyPath(CALayer.frame), #keyPath(CALayer.position)]
+        [lastSuggested?.view].forEach { (view) in
+            layerKeyPaths.forEach { (keyPath) in
+                if view?.layer.observationInfo != nil {
+                    view?.layer.removeObserver(self, forKeyPath: keyPath)
+                }
+                if view?.layer.superlayer?.observationInfo != nil {
+                    view?.layer.superlayer?.removeObserver(self, forKeyPath: keyPath)
                 }
             }
         }
@@ -178,11 +200,7 @@ private extension SuggestionsObject {
     
     func boundsForDrawingText() -> CGRect {
         let offset = Constant.textDrawingSuperviewOffset
-        if #available(iOS 11.0, *) {
-            return frame.inset(by: UIEdgeInsets(top: insets.top + offset, left: insets.left + offset, bottom: insets.bottom + offset, right: insets.right + offset))
-        } else {
-            return frame.inset(by: UIEdgeInsets(top: offset, left:offset, bottom:offset, right: offset))
-        }
+        return frame.inset(by: UIEdgeInsets(top: offset, left: offset, bottom: offset + insets.bottom, right: offset))
     }
     
     func updateText(suggestion: Suggestion) {
@@ -198,7 +216,7 @@ private extension SuggestionsObject {
     }
     
     func updateUnblur(suggestion: Suggestion) {
-        unblurLayer?.update(frame: layer.frame)
+        unblurLayer?.update(frame: layer.bounds)
         unblurLayer?.updateUnblur(suggestion: suggestion, holeRect: holeRect, animationDuration: holeMoveDuration)
     }
     
@@ -302,6 +320,8 @@ private extension SuggestionsObject {
         main.alpha = 0.0
         main.mainViewResizedBlock = { [weak self] frame in
             self?.performUpdateAfterBoundsChange()
+            self?.lastSuggested?.view.layoutIfNeeded()
+            self?.lastSuggested?.view.setNeedsLayout()
         }
         mainView = main
     }

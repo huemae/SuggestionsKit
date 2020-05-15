@@ -76,19 +76,23 @@ private extension BlurLayer {
     
     func commonInit(parent: CALayer, config: SuggestionsConfig, update: Bool = false) {
         layer.isGeometryFlipped = true
-        layer.contents = nil
         OperationQueue.main.cancelAllOperations()
         OperationQueue.main.addOperation { [weak self] in
             guard let strongSelf = self else { return }
             let rendered = strongSelf.renderBackgroundImage(parent: parent)
-            strongSelf.layer.opacity = 0.0
-            strongSelf.layer.contents = rendered
-            let animations = [AnimationInfo(key: "opacity", fromValue: 0, toValue: 1)]
+            strongSelf.layer.opacity = 0.8
+            
+            let animations = [AnimationInfo(key: "contents", fromValue: strongSelf.layer.contents, toValue: rendered),
+                              AnimationInfo(key: "opacity", fromValue: 0, toValue: 1),
+                              AnimationInfo(key: "frame", fromValue: NSValue(cgRect: strongSelf.layer.frame), toValue: NSValue(cgRect: parent.bounds))]
             strongSelf.layer.perfrormAnimation(items: animations, timing: config.animationsTimingFunction, duration: 0.2, fillMode: .forwards, changeValuesClosure: {
                 strongSelf.layer.opacity = 1.0
+                strongSelf.layer.frame = parent.bounds
+                strongSelf.layer.contents = rendered
             })
+            strongSelf.layer.frame = parent.bounds
         }
-        layer.frame = parent.bounds
+        
         layer.contentsGravity = .resizeAspectFill
         layer.contentsScale = UIScreen.main.scale
         layer.opacity = 1.0

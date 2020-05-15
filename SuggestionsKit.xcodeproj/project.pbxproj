@@ -94,8 +94,18 @@
 				0D34C23A2456FF0F00C71396 /* SuggestionConfig.swift */,
 				0D50404D246166E900A9D5E4 /* SuggestionsHelper.swift */,
 				0D5040512462F3DE00A9D5E4 /* Components */,
+				0D4AD10E2469B77A00ECDFF5 /* Extensions */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		0D4AD10E2469B77A00ECDFF5 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				0D85512524640E15005DF06F /* UIView+Extension.swift */,
+				0D0554B32466CE0900054EB1 /* CALayer+Extension.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		0D5040512462F3DE00A9D5E4 /* Components */ = {
@@ -109,9 +119,7 @@
 				0D34C23D2456FF0F00C71396 /* FillLayer.swift */,
 				0D34C23E2456FF0F00C71396 /* TextLayer.swift */,
 				0D50404F2462F3AF00A9D5E4 /* AnimatableTextLayer.swift */,
-				0D85512524640E15005DF06F /* UIView+Extension.swift */,
 				0D0554B52466CE3B00054EB1 /* AnimationInfo.swift */,
-				0D0554B32466CE0900054EB1 /* CALayer+Extension.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -355,6 +363,7 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1.1;
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = org.cocoapods.demo.SuggestionsKit;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

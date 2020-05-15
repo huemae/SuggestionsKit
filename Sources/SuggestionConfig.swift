@@ -106,7 +106,7 @@ public struct SuggestionsConfig {
     let shouldBounceAfterMove: Bool
     let hapticEnabled: Bool
     
-    public init(buble: BubleConfig = BubleConfig(), text: TextConfig = TextConfig(), background: Background = Background(), animationsTimingFunction: CAMediaTimingFunctionName = .default, preferredTextAppearance: PreferredTextAppearance = .above, shouldBounceAfterMove: Bool = true, hapticEnabled: Bool = true) {
+    public init(buble: BubleConfig = BubleConfig(), text: TextConfig = TextConfig(), background: Background = Background(), animationsTimingFunction: CAMediaTimingFunctionName = .default, preferredTextAppearance: PreferredTextAppearance = .under, shouldBounceAfterMove: Bool = true, hapticEnabled: Bool = true) {
         self.buble = buble
         self.text = text
         self.background = background
