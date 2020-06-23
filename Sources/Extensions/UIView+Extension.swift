@@ -25,16 +25,27 @@
 
 import Foundation
 import UIKit
+import AVFoundation
 
 
 extension UIView {
+    
     func snapshot() -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(bounds.size, false, UIScreen.main.scale)
         guard let context = UIGraphicsGetCurrentContext() else { return nil }
+        context.interpolationQuality = .none
+        context.setShouldAntialias(false)
+        context.setAllowsAntialiasing(false)
+        context.setShouldSmoothFonts(false)
+        context.setShouldSubpixelPositionFonts(false)
+        context.setShouldSubpixelQuantizeFonts(false)
+        context.setAllowsFontSubpixelPositioning(false)
+        context.setAllowsFontSubpixelQuantization(false)
+        context.setMiterLimit(-100)
         layer.render(in: context)
         let img = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
+        
         return img
     }
 }
-

@@ -21,8 +21,8 @@
 		0D4422452467613300D8F6B6 /* Suggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D4422442467613300D8F6B6 /* Suggestion.swift */; };
 		0D50404E246166E900A9D5E4 /* SuggestionsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D50404D246166E900A9D5E4 /* SuggestionsHelper.swift */; };
 		0D5040502462F3AF00A9D5E4 /* AnimatableTextLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D50404F2462F3AF00A9D5E4 /* AnimatableTextLayer.swift */; };
-		0D5B2C25245EB9AC00E0BD01 /* MainViewLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5B2C24245EB9AC00E0BD01 /* MainViewLayer.swift */; };
 		0D85512624640E15005DF06F /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D85512524640E15005DF06F /* UIView+Extension.swift */; };
+		0D933F6F248C36EB00677F1F /* UIVisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D933F6E248C36EB00677F1F /* UIVisualEffectView.swift */; };
 		0DE9648A245D7CD500B1E8B4 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE96489245D7CD500B1E8B4 /* MainView.swift */; };
 /* End PBXBuildFile section */
 
@@ -43,8 +43,8 @@
 		0D4422442467613300D8F6B6 /* Suggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suggestion.swift; sourceTree = "<group>"; };
 		0D50404D246166E900A9D5E4 /* SuggestionsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsHelper.swift; sourceTree = "<group>"; };
 		0D50404F2462F3AF00A9D5E4 /* AnimatableTextLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatableTextLayer.swift; sourceTree = "<group>"; };
-		0D5B2C24245EB9AC00E0BD01 /* MainViewLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewLayer.swift; sourceTree = "<group>"; };
 		0D85512524640E15005DF06F /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
+		0D933F6E248C36EB00677F1F /* UIVisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIVisualEffectView.swift; sourceTree = "<group>"; };
 		0DE96489245D7CD500B1E8B4 /* MainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -104,6 +104,7 @@
 			children = (
 				0D85512524640E15005DF06F /* UIView+Extension.swift */,
 				0D0554B32466CE0900054EB1 /* CALayer+Extension.swift */,
+				0D933F6E248C36EB00677F1F /* UIVisualEffectView.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -112,7 +113,6 @@
 			isa = PBXGroup;
 			children = (
 				0DE96489245D7CD500B1E8B4 /* MainView.swift */,
-				0D5B2C24245EB9AC00E0BD01 /* MainViewLayer.swift */,
 				0D34C2362456FF0F00C71396 /* BlurLayer.swift */,
 				0D34C2372456FF0F00C71396 /* UnblurLayer.swift */,
 				0D34C23B2456FF0F00C71396 /* BubleLayer.swift */,
@@ -167,6 +167,7 @@
 				TargetAttributes = {
 					0D34C2292456FEE200C71396 = {
 						CreatedOnToolsVersion = 11.4;
+						LastSwiftMigration = 1140;
 					};
 				};
 			};
@@ -207,7 +208,6 @@
 				0D34C2462456FF0F00C71396 /* SuggestionsObject.swift in Sources */,
 				0D85512624640E15005DF06F /* UIView+Extension.swift in Sources */,
 				0D4422452467613300D8F6B6 /* Suggestion.swift in Sources */,
-				0D5B2C25245EB9AC00E0BD01 /* MainViewLayer.swift in Sources */,
 				0DE9648A245D7CD500B1E8B4 /* MainView.swift in Sources */,
 				0D34C2402456FF0F00C71396 /* BlurLayer.swift in Sources */,
 				0D0554B62466CE3B00054EB1 /* AnimationInfo.swift in Sources */,
@@ -218,6 +218,7 @@
 				0D34C2472456FF0F00C71396 /* FillLayer.swift in Sources */,
 				0D34C2412456FF0F00C71396 /* UnblurLayer.swift in Sources */,
 				0D34C2442456FF0F00C71396 /* SuggestionConfig.swift in Sources */,
+				0D933F6F248C36EB00677F1F /* UIVisualEffectView.swift in Sources */,
 				0D34C2452456FF0F00C71396 /* BubleLayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -368,6 +369,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

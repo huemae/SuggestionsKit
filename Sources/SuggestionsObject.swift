@@ -87,16 +87,16 @@ class SuggestionsObject: NSObject {
         }
     }
     
+    private var canUseFilteredLayer: Bool = {
+        return UIVisualEffectView.canUseFilteredLayer()
+    }()
+    
     var viewTappedBlock: (() -> ())?
     
     init(config: SuggestionsConfig) {
         self.config = config
         super.init()
         configure(with: config)
-    }
-    
-    deinit {
-        print("\(String(describing: self)) \(#function)")
     }
     
     func suggestionsFinished() {
@@ -122,10 +122,13 @@ class SuggestionsObject: NSObject {
         }
     }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-//        print((object as? NSObject)?.classForCoder ?? "", change?[NSKeyValueChangeKey.newKey] ?? "", keyPath)
+    func perfromWithDelayAndCanceling() {
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(performUpdateAfterBoundsChange), object: nil)
-        perform(#selector(performUpdateAfterBoundsChange), with: nil, afterDelay: 0)
+        perform(#selector(performUpdateAfterBoundsChange), with: nil, afterDelay: 0.0)
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        perfromWithDelayAndCanceling()
     }
 }
 
@@ -148,13 +151,6 @@ private extension SuggestionsObject {
     func startObserve(suggestion: Suggestion) {
         removeObservingAtLastSuggested()
         lastSuggested = suggestion
-        let keyPaths = [#keyPath(UIView.bounds), #keyPath(UIView.frame), #keyPath(UIView.center)]
-//        [lastSuggested?.view, lastSuggested?.view.superview].forEach { (view) in
-//            keyPaths.forEach { (keyPath) in
-//                view?.addObserver(self, forKeyPath: keyPath, options: [.new], context: nil)
-//            }
-//        }
-        
         let layerKeyPaths = [#keyPath(CALayer.bounds), #keyPath(CALayer.frame), #keyPath(CALayer.position)]
         [lastSuggested?.view].forEach { (view) in
             layerKeyPaths.forEach { (keyPath) in
@@ -165,15 +161,6 @@ private extension SuggestionsObject {
     }
     
     func removeObservingAtLastSuggested() {
-        let keyPaths = [#keyPath(UIView.bounds), #keyPath(UIView.frame), #keyPath(UIView.center)]
-//        [lastSuggested?.view, lastSuggested?.view.superview].forEach { (view) in
-//            keyPaths.forEach { (keyPath) in
-//                if view?.observationInfo != nil {
-//                    view?.removeObserver(self, forKeyPath: keyPath)
-//                }
-//            }
-//        }
-        
         let layerKeyPaths = [#keyPath(CALayer.bounds), #keyPath(CALayer.frame), #keyPath(CALayer.position)]
         [lastSuggested?.view].forEach { (view) in
             layerKeyPaths.forEach { (keyPath) in
@@ -293,13 +280,13 @@ private extension SuggestionsObject {
     
     func configureUnblurLayer(with blur: CALayer?, config: SuggestionsConfig) {
         guard let superBlur = blur else { return }
-        unblurLayer = UnblurLayer(maskedLayer: superBlur, superBunds: bounds, config: config)
+        unblurLayer = UnblurLayer(maskedLayer: superBlur, superBunds: bounds, config: config, filteredUsed: canUseFilteredLayer)
     }
     
     func configureBlurLayer(config: SuggestionsConfig) -> CALayer? {
         guard config.background.blurred else { return nil }
         var newLayer: CALayer?
-        blurLayer = BlurLayer(parent: layer, config: config, tempLayerClosure: { layer in
+        blurLayer = BlurLayer(parent: layer, config: config, filteredUsed: canUseFilteredLayer, tempLayerClosure: { layer in
             newLayer = layer
         })
         
@@ -319,9 +306,7 @@ private extension SuggestionsObject {
         let main = MainView(parent: superview)
         main.alpha = 0.0
         main.mainViewResizedBlock = { [weak self] frame in
-            self?.performUpdateAfterBoundsChange()
-            self?.lastSuggested?.view.layoutIfNeeded()
-            self?.lastSuggested?.view.setNeedsLayout()
+            self?.perfromWithDelayAndCanceling()
         }
         mainView = main
     }

@@ -33,10 +33,6 @@ class MainView: UIView {
     
     private var lastFrame: CGRect = .zero
     
-    override class var layerClass: AnyClass {
-        return MainViewLayer.self
-    }
-    
     init(parent: UIView) {
         super.init(frame: parent.bounds)
         commonInit(parent: parent)

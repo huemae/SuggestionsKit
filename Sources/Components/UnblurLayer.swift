@@ -29,16 +29,27 @@ import UIKit
 
 class UnblurLayer {
     
+    private enum Constant {
+        static let maxSize: CGSize = .init(width: 3000, height: 3000)
+    }
+    
     private let layer = CAShapeLayer()
     private let config: SuggestionsConfig
+    private let filteredUsed: Bool
     
-    init(maskedLayer: CALayer, superBunds: CGRect, config: SuggestionsConfig) {
+    
+    init(maskedLayer: CALayer, superBunds: CGRect, config: SuggestionsConfig, filteredUsed: Bool) {
         self.config = config
+        self.filteredUsed = filteredUsed
         commonInit(maskedLayer: maskedLayer, superBunds: superBunds)
     }
     
     func update(frame: CGRect) {
-        layer.frame = frame
+        if filteredUsed {
+            layer.frame = .init(origin: .zero, size: Constant.maxSize)
+        } else {
+            layer.frame = frame
+        }
     }
     
     func updateUnblur(suggestion: Suggestion, holeRect: CGRect, animationDuration: TimeInterval) {

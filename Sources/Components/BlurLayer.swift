@@ -31,11 +31,22 @@ class BlurLayer {
     
     private enum Constant {
         static let blurRadius: Float = 5
+        static let maxSize: CGSize = .init(width: 3000, height: 3000)
     }
     
-    private var layer: CAShapeLayer = CAShapeLayer()
+    private let layer: CALayer = {
+        if UIVisualEffectView.canUseFilteredLayer() {
+            return (UIVisualEffectView.filteredLayer() ?? CALayer())
+        }
+        return CALayer()
+    }()
     
-    init(parent: CALayer, config: SuggestionsConfig, tempLayerClosure: (CALayer) -> ()) {
+    private let context: CIContext = CIContext(options: [CIContextOption.outputColorSpace: NSNull()])
+    private let gaussianBlurFilter = CIFilter(name: "CIGaussianBlur")
+    private let filteredUsed: Bool
+    
+    init(parent: CALayer, config: SuggestionsConfig, filteredUsed: Bool, tempLayerClosure: (CALayer) -> ()) {
+        self.filteredUsed = filteredUsed
         commonInit(parent: parent, config: config)
         tempLayerClosure(layer)
     }
@@ -48,25 +59,24 @@ class BlurLayer {
 private extension BlurLayer {
     
     func convert(cmage: CIImage) -> CGImage? {
-        let context: CIContext = CIContext(options: nil)
+        
         guard let cgImage: CGImage = context.createCGImage(cmage, from: cmage.extent) else { return nil }
         
         let cgBlurRadius = CGFloat(Constant.blurRadius)
-        return cgImage.cropping(to: .init(x: cgBlurRadius * 3, y: cgBlurRadius * 3, width: layer.bounds.width * UIScreen.main.scale, height: layer.bounds.height * UIScreen.main.scale ))
+        return cgImage.cropping(to: .init(x: cgBlurRadius * 3, y: cgBlurRadius * 3, width: layer.bounds.width * UIScreen.main.scale, height: layer.bounds.height * UIScreen.main.scale))
     }
     
     func renderBackgroundImage(parent: CALayer) -> CGImage? {
-        let hiddenState = parent.isHidden
+        
+        parent.isHidden = true
         
         defer {
-            parent.isHidden = hiddenState
+            parent.isHidden = false
         }
-        parent.isHidden = true
         
         guard let image = UIApplication.shared.keyWindow?.snapshot()?.cgImage else { return nil }
 
         let imageToBlur: CIImage? = CIImage(cgImage: image)
-        let gaussianBlurFilter = CIFilter(name: "CIGaussianBlur")
         gaussianBlurFilter?.setValue(imageToBlur, forKey: "inputImage")
         gaussianBlurFilter?.setValue(NSNumber(value: Constant.blurRadius), forKey: "inputRadius")
         guard let resultImage = gaussianBlurFilter?.value(forKey: "outputImage") as? CIImage else { return nil }
@@ -74,33 +84,23 @@ private extension BlurLayer {
         return convert(cmage: resultImage)
     }
     
+    @objc func render() {
+        guard let superlayer = layer.superlayer else { return }
+        layer.contents = renderBackgroundImage(parent: superlayer)
+    }
+    
     func commonInit(parent: CALayer, config: SuggestionsConfig, update: Bool = false) {
         layer.isGeometryFlipped = true
-        OperationQueue.main.cancelAllOperations()
-        OperationQueue.main.addOperation { [weak self] in
-            guard let strongSelf = self else { return }
-            let rendered = strongSelf.renderBackgroundImage(parent: parent)
-            strongSelf.layer.opacity = 0.8
-            
-            let animations = [AnimationInfo(key: "contents", fromValue: strongSelf.layer.contents, toValue: rendered),
-                              AnimationInfo(key: "opacity", fromValue: 0, toValue: 1),
-                              AnimationInfo(key: "frame", fromValue: NSValue(cgRect: strongSelf.layer.frame), toValue: NSValue(cgRect: parent.bounds))]
-            strongSelf.layer.perfrormAnimation(items: animations, timing: config.animationsTimingFunction, duration: 0.2, fillMode: .forwards, changeValuesClosure: {
-                strongSelf.layer.opacity = 1.0
-                strongSelf.layer.frame = parent.bounds
-                strongSelf.layer.contents = rendered
-            })
-            strongSelf.layer.frame = parent.bounds
-        }
-        
-        layer.contentsGravity = .resizeAspectFill
-        layer.contentsScale = UIScreen.main.scale
-        layer.opacity = 1.0
-        layer.name = String(describing: self)
-        
+        layer.drawsAsynchronously = true
         parent.insertSublayer(layer, at: 1)
+        layer.anchorPoint = .init(x: 1.0, y: 1.0)
+        if filteredUsed {
+            layer.frame = .init(origin: .zero, size: Constant.maxSize)
+        } else {
+            layer.contentsGravity = .resizeAspectFill
+            layer.frame = parent.frame
+            render()
+        }
+        layer.name = String(describing: self)
     }
 }
-
-
-
