@@ -1,3 +1,4 @@
+os: osx
 language: swift
 osx_image: xcode11.5
 xcode_workspace: SuggestionsKit.xcworkspace
