@@ -30,10 +30,13 @@ import UIKit
 /// Manager that present interface to show suggestions
 final public class SuggestionsManager {
     
+    public typealias VoidBlock = () -> ()
+    
     private static let shared = SuggestionsManager()
     
     private var suggestions: [Suggestion] = []
     private var suggestionsOverlay: SuggestionsObject?
+    private var completionBlock: VoidBlock?
     
     private init() { }
 
@@ -55,8 +58,16 @@ final public class SuggestionsManager {
     }
     
     /// Call this method to start presentation of suggestions
-    public static func startShowing() {
+    @discardableResult
+    public static func startShowing() -> SuggestionsManager.Type {
         shared.updateSuggestion()
+        
+        return SuggestionsManager.self
+    }
+    
+    /// Call this method to set completion block that will be called after all suggestion showing
+    public static func completion(block: @escaping VoidBlock) {
+        setCompletion(block: block)
     }
     
     /// Call this method to stop presentation of suggestions
@@ -67,10 +78,16 @@ final public class SuggestionsManager {
 
 private extension SuggestionsManager {
     
+    static func setCompletion(block: @escaping VoidBlock) {
+        shared.completionBlock = block
+    }
+    
     func updateSuggestion() {
         guard let sug = suggestions.first else {
             suggestionsOverlay?.updateForSuggestion(suggestion: nil)
             suggestionsOverlay?.suggestionsFinished()
+            completionBlock?()
+            completionBlock = nil
             return
         }
         suggestionsOverlay?.updateForSuggestion(suggestion: sug)

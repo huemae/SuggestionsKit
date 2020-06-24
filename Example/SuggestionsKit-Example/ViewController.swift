@@ -71,5 +71,8 @@ class ViewController: UIViewController {
         SuggestionsManager.apply(suggestions)
             .configre(config)
             .startShowing()
+            .completion {
+                print("suggestions finished")
+            }
     }
 }

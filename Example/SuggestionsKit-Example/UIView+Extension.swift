@@ -24,10 +24,8 @@
 //  THE SOFTWARE.
 
 import Foundation
-
-
-import Foundation
 import UIKit
+
 
 @IBDesignable
 class DesignableView: UIView {
