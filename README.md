@@ -2,7 +2,7 @@
 
 ![SuggestionsKit](https://i.imgur.com/Z9SfxiO.gif)
 
-[![CI Status](https://img.shields.io/travis/huemae/SuggestionsKit.svg?style=flat)](https://travis-ci.org/huemae/SuggestionsKit)
+[![CI Status](https://travis-ci.org/huemae/SuggestionsKit.svg?branch=master)](https://travis-ci.org/huemae/SuggestionsKit)
 [![Version](https://img.shields.io/cocoapods/v/SuggestionsKit.svg?style=flat)](https://cocoapods.org/pods/SuggestionsKit)
 [![License](https://img.shields.io/cocoapods/l/SuggestionsKit.svg?style=flat)](https://cocoapods.org/pods/SuggestionsKit)
 [![Platform](https://img.shields.io/cocoapods/p/SuggestionsKit.svg?style=flat)](https://cocoapods.org/pods/SuggestionsKit)
