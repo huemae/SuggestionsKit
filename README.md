@@ -58,6 +58,15 @@ If suggestions ended whole view will dissapear automaticaly. If you want to stop
 ```swift
 SuggestionsManager.stopShowing()
 ```
+If you want to be notified when suggestion come to an end just call ```completion``` method of ```SuggestionManager``` that takes void closure as an argument
+```swift
+SuggestionsManager.apply(suggestions)
+    .configre(config)
+    .startShowing()
+    .completion {
+        print("suggestions finished")
+    }
+ ```
 
 ## Example
 
