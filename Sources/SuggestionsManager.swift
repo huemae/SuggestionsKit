@@ -72,7 +72,8 @@ final public class SuggestionsManager {
     
     /// Call this method to stop presentation of suggestions
     public static func stopShowing() {
-        shared.suggestionsOverlay?.suggestionsFinished()
+        shared.suggestions = []
+        shared.updateSuggestion()
     }
 }
 
@@ -86,6 +87,7 @@ private extension SuggestionsManager {
         guard let sug = suggestions.first else {
             suggestionsOverlay?.updateForSuggestion(suggestion: nil)
             suggestionsOverlay?.suggestionsFinished()
+            suggestionsOverlay = nil
             completionBlock?()
             completionBlock = nil
             return

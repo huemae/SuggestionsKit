@@ -51,6 +51,10 @@ class TableViewController: UITableViewController {
             case 4:
                 let config = SuggestionsConfig()
                 return ("Tab bar items support", config)
+            case 5:
+                let config = SuggestionsConfig(text: .init(font: UIFont.systemFont(ofSize: 30, weight: .bold)))
+                return ("Different fonts", config)
+            
             default:
                 let config = SuggestionsConfig()
                 return ("Default", config)

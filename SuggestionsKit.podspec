@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'SuggestionsKit'
-  s.version          = '1.2.2'
+  s.version          = '1.2.3'
   s.summary          = 'This framework was created in order to provide developers with the opportunity to educate users on various features of applications.'
   s.swift_version = '4.2'
 

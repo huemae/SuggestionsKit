@@ -26,6 +26,7 @@
 import Foundation
 import UIKit
 
+
 class SuggestionsObject: NSObject {
     
     enum Constant {

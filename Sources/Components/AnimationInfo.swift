@@ -26,7 +26,6 @@
 import Foundation
 
 
-
 struct AnimationInfo {
     let key: String
     let fromValue: Any?

@@ -26,6 +26,7 @@
 import Foundation
 import UIKit
 
+
 class FillLayer {
     
     var suggestionFrameClosue: ((Suggestion) -> CGRect)?
