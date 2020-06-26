@@ -30,11 +30,9 @@ import UIKit
 extension UIVisualEffectView {
     
     static func canUseFilteredLayer() -> Bool {
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+//        let view = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         
-        return false
-                
-        return !(view.layer.sublayers?.first?.filters?.isEmpty ?? true)
+        return false //!(view.layer.sublayers?.first?.filters?.isEmpty ?? true)
     }
     
     static func filteredLayer() -> CALayer? {

@@ -60,6 +60,7 @@ private extension FillLayer {
     }
     
     func internalUpdate(suggestion: Suggestion) {
+        guard let view = suggestion.view else { return }
         layer.path = mainPath.cgPath
         let sugFrame = suggestionFrameClosue?(suggestion) ?? .zero
         let width = sugFrame.width + SuggestionsObject.Constant.holeOverdrawAmount
@@ -70,7 +71,7 @@ private extension FillLayer {
         holeRect = CGRect(x: sugFrame.origin.x - halfOverdraw, y: sugFrame.origin.y - halfOverdraw, width: width, height: height)
         
         let finalRadius: CGFloat = {
-            let sugRadius = suggestion.view.layer.cornerRadius
+            let sugRadius = view.layer.cornerRadius
             if sugRadius > 0 {
                 if sugRadius == sugFrame.size.height / 2 {
                     return holeRect.width / 2

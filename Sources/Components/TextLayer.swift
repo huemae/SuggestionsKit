@@ -51,13 +51,14 @@ private extension TextLayer {
     func internalUpdate(boundsForDrawing: CGRect, maxTextWidth: CGFloat, suggestion: Suggestion, animationDuration: TimeInterval) {
         let attrs = [NSAttributedString.Key.font: config.text.font, NSAttributedString.Key.foregroundColor: config.text.textColor]
         let newString = NSAttributedString(string: suggestion.text, attributes: attrs)
-        let newSize = suggestion.text.calculateHeight(textFont: config.text.font, maxWidth: maxTextWidth)
+        let size = suggestion.text.calculateHeight(textFont: config.text.font, maxWidth: maxTextWidth)
+        let newSize = size.size
         
         let suggFrame: CGRect = suggestionFrameClosue?(suggestion) ?? .zero
         
         let isRight = suggFrame.midX > boundsForDrawing.width / 2
         layer.bounds = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
-        let newAlignment = isRight ? CATextLayerAlignmentMode.right : CATextLayerAlignmentMode.left
+        let newAlignment = isRight ? NSTextAlignment.right : NSTextAlignment.left
         
         
         let boundsToDraw: CGRect = boundsForDrawing
@@ -120,17 +121,16 @@ private extension TextLayer {
 
         let fromPosition = layer.position == .zero ? finalPosition : NSValue(cgPoint: layer.position)
         
+        layer.updateInfo(text: newString, size: .init(lines: size.lines, size: size.size, alignment: newAlignment))
+        
         let animations: [AnimationInfo] = [
             .init(key: #keyPath(CATextLayer.position), fromValue: fromPosition, toValue: finalPosition),
-            .init(key: #keyPath(CATextLayer.frame), fromValue: NSValue(cgRect: oldBounds), toValue: NSValue(cgRect: newBounds)),
-            .init(key: #keyPath(CATextLayer.alignmentMode), fromValue: layer.alignmentMode.rawValue, toValue: newAlignment.rawValue)
+            .init(key: #keyPath(CATextLayer.frame), fromValue: NSValue(cgRect: oldBounds), toValue: NSValue(cgRect: newBounds))
         ]
         
         layer.perfrormAnimation(items: animations, timing: config.animationsTimingFunction, duration: animationDuration, fillMode: .forwards, changeValuesClosure: { [weak self] in
             self?.layer.frame = newBounds
             self?.layer.position = finalPoint
-            self?.layer.string = newString
-            self?.layer.alignmentMode = newAlignment
         })
         textLayerUpdatedFrameClosue?(newFrame)
         

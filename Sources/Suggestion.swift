@@ -28,7 +28,7 @@ import UIKit
 
 
 @objc public class Suggestion: NSObject {
-    let view: UIView
+    weak var view: UIView?
     let text: String
     
     public init(view: UIView, text: String) {

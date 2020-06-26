@@ -29,7 +29,7 @@ import UIKit
 
 class BubleLayer {
     
-    private var layer = CAShapeLayer()
+    private var layer = ReanimatableLayer()
     private let config: SuggestionsConfig
     
     init(parent: CALayer, config: SuggestionsConfig, tempLayerClosure: (CALayer) -> ()) {
@@ -143,3 +143,35 @@ private extension BubleLayer {
     }
 }
 
+
+class ReanimatableLayer: CAShapeLayer {
+    
+    private var tempAnimation: CAAnimation?
+    private var tempAnimationKey: String?
+    
+    override init() {
+        super.init()
+        NotificationCenter.default.addObserver(self, selector: #selector(back), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(front), name: UIApplication.didBecomeActiveNotification, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc func back() {
+        let anim = animationKeys()?.compactMap { (animation(forKey: $0), $0) }.first
+        removeAllAnimations()
+        tempAnimationKey = anim?.1
+        tempAnimation = anim?.0?.mutableCopy() as? CAAnimation
+    }
+    
+    @objc func front() {
+        guard let anim = tempAnimation, let key = tempAnimationKey else { return }
+        add(anim, forKey: key)
+    }
+}

@@ -32,7 +32,7 @@ final public class SuggestionsManager {
     
     public typealias VoidBlock = () -> ()
     
-    private static let shared = SuggestionsManager()
+    private static var shared: SuggestionsManager?
     
     private var suggestions: [Suggestion] = []
     private var suggestionsOverlay: SuggestionsObject?
@@ -45,14 +45,16 @@ final public class SuggestionsManager {
     ///   - suggestions: Array of suggestions that you want to show to the user
     ///   - config: Configuration that will be applied to all suggestions shown by this manager
     public static func apply(_ suggestions: [Suggestion]) -> SuggestionsManager.Type {
-        shared.suggestionsOverlay?.suggestionsFinished()
-        shared.suggestions = suggestions.filter { $0.view.superview != nil }
+        shared = SuggestionsManager()
+        shared?.suggestionsOverlay?.suggestionsFinished()
+        shared?.suggestions = suggestions
+            .filter { $0.view?.superview != nil }
         
         return SuggestionsManager.self
     }
     
     public static func configre(_ config: SuggestionsConfig = SuggestionsConfig()) -> SuggestionsManager.Type {
-        shared.start(config: config)
+        shared?.start(config: config)
         
         return SuggestionsManager.self
     }
@@ -60,7 +62,7 @@ final public class SuggestionsManager {
     /// Call this method to start presentation of suggestions
     @discardableResult
     public static func startShowing() -> SuggestionsManager.Type {
-        shared.updateSuggestion()
+        shared?.updateSuggestion()
         
         return SuggestionsManager.self
     }
@@ -72,24 +74,26 @@ final public class SuggestionsManager {
     
     /// Call this method to stop presentation of suggestions
     public static func stopShowing() {
-        shared.suggestions = []
-        shared.updateSuggestion()
+        shared?.suggestions = []
+        shared?.updateSuggestion()
     }
 }
 
 private extension SuggestionsManager {
     
     static func setCompletion(block: @escaping VoidBlock) {
-        shared.completionBlock = block
+        shared?.completionBlock = block
     }
     
     func updateSuggestion() {
-        guard let sug = suggestions.first else {
+        guard let sug = suggestions.filter({ $0.view != nil }).first else {
             suggestionsOverlay?.updateForSuggestion(suggestion: nil)
             suggestionsOverlay?.suggestionsFinished()
             suggestionsOverlay = nil
+            suggestions = []
             completionBlock?()
             completionBlock = nil
+            SuggestionsManager.shared = nil
             return
         }
         suggestionsOverlay?.updateForSuggestion(suggestion: sug)

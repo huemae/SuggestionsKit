@@ -29,13 +29,33 @@ import UIKit
 
 extension String {
     
+    final class TextNodeLine {
+        let line: CTLine
+        let frame: CGRect
+        let range: NSRange
+        let isRTL: Bool
+        
+        init(line: CTLine, frame: CGRect, range: NSRange, isRTL: Bool) {
+            self.line = line
+            self.frame = frame
+            self.range = range
+            self.isRTL = isRTL
+        }
+    }
+    
+    struct TextSizeItem {
+        let lines: [TextNodeLine]
+        let size: CGSize
+        let alignment: NSTextAlignment
+    }
+    
     static var screenScale = UIScreen.main.scale
     
     func floorToScreenPixels(_ value: CGFloat) -> CGFloat {
         return floor(value * Self.screenScale) / Self.screenScale
     }
     
-    func calculateHeight(textFont: UIFont, maxWidth: CGFloat) -> CGSize {
+    func calculateHeight(textFont: UIFont, maxWidth: CGFloat) -> TextSizeItem {
         
         let constrainedSize: CGSize = .init(width: maxWidth, height: .greatestFiniteMagnitude)
         let attributedString = NSAttributedString(string: self, attributes: [NSAttributedString.Key.font: textFont])
@@ -68,6 +88,7 @@ extension String {
         
         var first = true
         var linesCount = 0
+        var lines: [TextNodeLine] = []
         while true {
             let lineConstrainedWidth = constrainedSize.width
             var lineOriginY = floorToScreenPixels(layoutSize.height + fontAscent)
@@ -75,6 +96,7 @@ extension String {
                 lineOriginY += fontLineSpacing
             }
             let lineAdditionalWidth: CGFloat = 0.0
+            let lineCutoutOffset: CGFloat = 0.0
             
             let lineCharacterCount = CTTypesetterSuggestLineBreak(typesetter, lastLineCharacterIndex, Double(lineConstrainedWidth))
             
@@ -116,9 +138,21 @@ extension String {
                 }
                 
                 let lineWidth = min(constrainedSize.width, ceil(CGFloat(CTLineGetTypographicBounds(coreTextLine, nil, nil, nil) - CTLineGetTrailingWhitespaceWidth(coreTextLine))))
+                let lineFrame = CGRect(x: lineCutoutOffset, y: lineOriginY, width: lineWidth, height: fontLineHeight)
                 layoutSize.height += fontLineHeight + fontLineSpacing
                 layoutSize.width = max(layoutSize.width, lineWidth + lineAdditionalWidth)
                 linesCount += 1
+                
+                var isRTL = false
+                let glyphRuns = CTLineGetGlyphRuns(coreTextLine) as NSArray
+                if glyphRuns.count != 0 {
+                    let run = glyphRuns[0] as! CTRun
+                    if CTRunGetStatus(run).contains(CTRunStatus.rightToLeft) {
+                        isRTL = true
+                    }
+                }
+                
+                lines.append(TextNodeLine(line: coreTextLine, frame: lineFrame, range: NSMakeRange(lineRange.location, lineRange.length), isRTL: isRTL))
                 
                 break
             } else {
@@ -137,6 +171,20 @@ extension String {
                     layoutSize.height += fontLineHeight
                     layoutSize.width = max(layoutSize.width, lineWidth + lineAdditionalWidth)
                     linesCount += 1
+                    
+                    let lineFrame = CGRect(x: lineCutoutOffset, y: lineOriginY, width: lineWidth, height: fontLineHeight)
+                    
+                    var isRTL = false
+                    let glyphRuns = CTLineGetGlyphRuns(coreTextLine) as NSArray
+                    if glyphRuns.count != 0 {
+                        let run = glyphRuns[0] as! CTRun
+                        if CTRunGetStatus(run).contains(CTRunStatus.rightToLeft) {
+                            isRTL = true
+                        }
+                    }
+                    
+                    lines.append(TextNodeLine(line: coreTextLine, frame: lineFrame, range: NSMakeRange(lineRange.location, lineRange.length), isRTL: isRTL))
+                    
                 } else {
                     if linesCount > 0 {
                         layoutSize.height += fontLineSpacing
@@ -145,7 +193,8 @@ extension String {
                 }
             }
         }
+        let size = CGSize(width: ceil(layoutSize.width), height: ceil(layoutSize.height))
         
-        return CGSize(width: ceil(layoutSize.width), height: ceil(layoutSize.height))
+        return TextSizeItem(lines: lines, size: size, alignment: .left)
     }
 }

@@ -113,6 +113,6 @@ public struct SuggestionsConfig {
         self.animationsTimingFunction = animationsTimingFunction
         self.preferredTextAppearance = preferredTextAppearance
         self.shouldBounceAfterMove = shouldBounceAfterMove
-        self.hapticEnabled = true
+        self.hapticEnabled = hapticEnabled
     }
 }

@@ -31,6 +31,8 @@ class AnimatableTextLayer: CATextLayer {
     
     private var config: SuggestionsConfig
     private var animationDuration: TimeInterval = 0
+    private var nextString: NSAttributedString = .init()
+    private var nextSize: String.TextSizeItem = .init(lines: [], size: .zero, alignment: .left)
     
     init(with config: SuggestionsConfig) {
         let layer = CATextLayer()
@@ -47,13 +49,68 @@ class AnimatableTextLayer: CATextLayer {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func draw(in ctx: CGContext) {
+        let context = ctx
+        
+        context.setAllowsAntialiasing(true)
+        
+        context.setAllowsFontSmoothing(false)
+        context.setShouldSmoothFonts(false)
+        
+        context.setAllowsFontSubpixelPositioning(false)
+        context.setShouldSubpixelPositionFonts(false)
+        
+        context.setAllowsFontSubpixelQuantization(true)
+        context.setShouldSubpixelQuantizeFonts(true)
+        
+                    
+        let textMatrix = context.textMatrix
+        let textPosition = context.textPosition
+        
+        context.textMatrix = CGAffineTransform(scaleX: 1.0, y: -1.0)
+        
+        let alignment = nextSize.alignment
+        let offset = CGPoint.zero
+        
+        for i in 0 ..< nextSize.lines.count {
+            let line = nextSize.lines[i]
+            
+            var lineFrame = line.frame
+            lineFrame.origin.y += offset.y
+            
+            if alignment == .left {
+                lineFrame.origin.x = 0
+            } else if alignment == .right {
+                lineFrame.origin.x = offset.x + floor(bounds.size.width - lineFrame.width)
+            }
+            context.textPosition = CGPoint(x: lineFrame.minX, y: lineFrame.minY)
+            CTLineDraw(line.line, context)
+        }
+        context.textMatrix = textMatrix
+        context.textPosition = CGPoint(x: textPosition.x, y: textPosition.y)
+        
+        context.setBlendMode(.normal)
+    }
+    
+    private func displayLineFrame(frame: CGRect, isRTL: Bool, boundingRect: CGRect) -> CGRect {
+        if frame.width.isEqual(to: boundingRect.width) {
+            return frame
+        }
+        var lineFrame = frame
+        if isRTL {
+            lineFrame.origin.x = max(0.0, floor(boundingRect.width - lineFrame.size.width))
+        }
+        return lineFrame
+    }
+    
     func updateNextAnimationDuration(duration: TimeInterval) {
         animationDuration = duration
     }
     
-    
-    override func add(_ anim: CAAnimation, forKey key: String?) {
-        super.add(anim, forKey: key)
+    func updateInfo(text: NSAttributedString, size: String.TextSizeItem) {
+        nextSize = size
+        nextString = text
+        setNeedsDisplay()
     }
     
     override func action(forKey event: String) -> CAAction? {

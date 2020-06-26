@@ -49,6 +49,7 @@ class SuggestionsObject: NSObject {
     private var holeRect: CGRect = .zero
     private var textLayerRect: CGRect = .zero
     private var holeMoveDuration: TimeInterval = 0
+    private var hashTable: NSHashTable<NSKeyValueObservation> = NSHashTable()
     
     private var shouldTouchBeCounted = true
     
@@ -102,7 +103,6 @@ class SuggestionsObject: NSObject {
     
     func suggestionsFinished() {
         mainView?.finish()
-        removeObservingAtLastSuggested()
     }
     
     func updateForSuggestion(suggestion: Suggestion?) {
@@ -116,6 +116,7 @@ class SuggestionsObject: NSObject {
             if config.hapticEnabled {
                 if #available(iOS 10.0, *) {
                     let generator = UINotificationFeedbackGenerator()
+                    generator.prepare()
                     generator.notificationOccurred(.success)
                 }
             }
@@ -150,35 +151,35 @@ private extension SuggestionsObject {
     }
     
     func startObserve(suggestion: Suggestion) {
-        removeObservingAtLastSuggested()
         lastSuggested = suggestion
-        let layerKeyPaths = [#keyPath(CALayer.bounds), #keyPath(CALayer.frame), #keyPath(CALayer.position)]
-        [lastSuggested?.view].forEach { (view) in
-            layerKeyPaths.forEach { (keyPath) in
-                view?.layer.addObserver(self, forKeyPath: keyPath, options: [.new], context: nil)
-                view?.layer.superlayer?.addObserver(self, forKeyPath: keyPath, options: [.new], context: nil)
-            }
+        hashTable.removeAllObjects()
+        let closure: ((CALayer, NSKeyValueObservedChange<CGRect>) -> Void) = { [weak self] la, value in
+            self?.perfromWithDelayAndCanceling()
         }
+        let closurePoint: ((CALayer, NSKeyValueObservedChange<CGPoint>) -> Void) = { [weak self] la, value in
+            self?.perfromWithDelayAndCanceling()
+        }
+        let newObs = view.layer.observe(\.bounds, changeHandler: closure)
+        let newObs1 = view.layer.observe(\.frame, changeHandler: closure)
+        let newObs2 = view.layer.observe(\.position, changeHandler: closurePoint)
+        let newObss = view.layer.superlayer?.observe(\.bounds, changeHandler: closure)
+        let newObs11 = view.layer.superlayer?.observe(\.frame, changeHandler: closure)
+        let newObs22 = view.layer.superlayer?.observe(\.position, changeHandler: closurePoint)
+        hashTable.add(newObs)
+        hashTable.add(newObs1)
+        hashTable.add(newObs2)
+        hashTable.add(newObss)
+        hashTable.add(newObs11)
+        hashTable.add(newObs22)
     }
     
     func removeObservingAtLastSuggested() {
-        let layerKeyPaths = [#keyPath(CALayer.bounds), #keyPath(CALayer.frame), #keyPath(CALayer.position)]
-        [lastSuggested?.view].forEach { (view) in
-            layerKeyPaths.forEach { (keyPath) in
-                if view?.layer.observationInfo != nil {
-                    view?.layer.removeObserver(self, forKeyPath: keyPath)
-                }
-                if view?.layer.superlayer?.observationInfo != nil {
-                    view?.layer.superlayer?.removeObserver(self, forKeyPath: keyPath)
-                }
-            }
-        }
     }
     
     func frame(of suggestion: Suggestion) -> CGRect {
-        guard let superview = mainView?.superview else { return .zero }
-        let newOrigin = suggestion.view.convert(superview.frame, to: nil).origin
-        return CGRect(x: newOrigin.x, y: newOrigin.y, width: suggestion.view.frame.width, height: suggestion.view.frame.height)
+        guard let superview = mainView?.superview, let view = suggestion.view else { return .zero }
+        let newOrigin = view.convert(superview.frame, to: nil).origin
+        return CGRect(x: newOrigin.x, y: newOrigin.y, width: view.frame.width, height: view.frame.height)
     }
     
     func maxWidthToDrawText() -> CGFloat {
