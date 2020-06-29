@@ -51,22 +51,28 @@ class ViewController: UIViewController {
     func showSuggestions() {
         var suggestions: [Suggestion] = []
         if tabBarTest {
-            let bottomSuggestions = SuggestionsHelper.createSuggestionsFromBarItems(items: tabBarController?.tabBar.items) { index in
-                return "Also supports tab bar items \(index)"
-            }
-            suggestions = bottomSuggestions
+            let tabBarItems = SuggestionsHelper.findAllBarItems(in: tabBarController?.tabBar)
+            suggestions += tabBarItems.enumerated()
+                .map { Suggestion(view: $0.element, text: "Tab bar item \($0.offset)") }
         } else {
-            let rightSuggestions = SuggestionsHelper.createSuggestionsFromBarItems(items: navigationItem.rightBarButtonItems) { index in
-                return "Tap here to restart suggestions\n(navigation items support)"
-            }
             let sendSuggestion = Suggestion(view: sendMessageButton, text: "Tap here to send message to user")
             let shareSuggestion = Suggestion(view: shareButton, text: "Tap here to share users profile")
             let infoSuggestion = Suggestion(view: infoLabel, text: "Small info about user")
             let winkSuggestion = Suggestion(view: winkButton, text: "You also can wink to show what you are interested in a person")
             let blockSuggestion = Suggestion(view: blockUser, text: "Or block the user if he is obsessive")
             
-            suggestions = rightSuggestions + [sendSuggestion, shareSuggestion, infoSuggestion, winkSuggestion, blockSuggestion]
+            suggestions = [sendSuggestion, shareSuggestion, infoSuggestion, winkSuggestion, blockSuggestion]
+            
+            if let titleLabel = SuggestionsHelper.findViewRecursively(in: navigationController?.navigationBar, parameters: SuggestionsHelper.SearchViewParameters(type: UILabel.self, search: .byText("Example"))) {
+                let suggestion = Suggestion.init(view: titleLabel, text: "Title support!")
+                suggestions += [suggestion]
+            }
+            let navItems = SuggestionsHelper.findAllBarItems(in: navigationController?.navigationBar)
+            let navSuggestions = navItems.enumerated()
+                .map { Suggestion(view: $0.element, text: $0.offset == 0 ? "back button" : "bar button item") }
+            suggestions += navSuggestions
         }
+        
         
         SuggestionsManager.apply(suggestions)
             .configre(config)

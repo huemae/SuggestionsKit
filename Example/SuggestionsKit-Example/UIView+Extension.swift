@@ -125,4 +125,23 @@ extension UIView {
       }
     }
   }
+    
+    
+
 }
+
+extension UIBarButtonItem {
+    
+    @IBInspectable
+    var tagged: Int {
+        get {
+            return objc_getAssociatedObject(self, &xoAssociationKey) as? Int ?? -1
+        }
+        set(newValue) {
+            objc_setAssociatedObject(self, &xoAssociationKey, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
+        
+    }
+}
+
+private var xoAssociationKey: UInt8 = 0

@@ -51,8 +51,16 @@ public struct SuggestionsConfig {
         let borderColor: UIColor
         /// Buble background color
         let backgroundColor: UIColor
+        /// Buble shadow color
+        let shadowColor: UIColor
+        /// Buble shadow radius
+        let shadowRadius: CGFloat
+        /// Buble shadow opacity
+        let shadowOpacity: CGFloat
+        /// Buble shadow offset
+        let shadowOffset: CGSize
         
-        public init(shouldDraw: Bool = true, tailHeight: CGFloat = 4, focusOffset: CGFloat = 4, cornerRadius: CGFloat = 10, borderWidth: CGFloat = 0.5, borderColor: UIColor = UIColor.clear, backgroundColor: UIColor = UIColor.white) {
+        public init(shouldDraw: Bool = true, tailHeight: CGFloat = 4, focusOffset: CGFloat = 4, cornerRadius: CGFloat = 10, borderWidth: CGFloat = 0.5, borderColor: UIColor = UIColor.clear, backgroundColor: UIColor = UIColor.white, shadowColor: UIColor = UIColor.black, shadowRadius: CGFloat = 10, shadowOpacity: CGFloat = 0.5, shadowOffset: CGSize = CGSize(width: 1, height: 1)) {
             self.shouldDraw = shouldDraw
             self.tailHeight = tailHeight
             self.focusOffset = focusOffset
@@ -60,6 +68,10 @@ public struct SuggestionsConfig {
             self.borderWidth = borderWidth
             self.borderColor = borderColor
             self.backgroundColor = backgroundColor
+            self.shadowColor = shadowColor
+            self.shadowRadius = shadowRadius
+            self.shadowOpacity = shadowOpacity
+            self.shadowOffset = shadowOffset
         }
     }
     
@@ -104,6 +116,7 @@ public struct SuggestionsConfig {
     let preferredTextAppearance: PreferredTextAppearance
     /// If true text and buble will bounce around suggestion item
     let shouldBounceAfterMove: Bool
+    /// If true will be haptic feedback after passing to next suggestions and after finishing
     let hapticEnabled: Bool
     
     public init(buble: BubleConfig = BubleConfig(), text: TextConfig = TextConfig(), background: Background = Background(), animationsTimingFunction: CAMediaTimingFunctionName = .default, preferredTextAppearance: PreferredTextAppearance = .under, shouldBounceAfterMove: Bool = true, hapticEnabled: Bool = true) {

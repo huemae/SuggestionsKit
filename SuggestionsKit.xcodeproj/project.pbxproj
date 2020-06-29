@@ -24,6 +24,7 @@
 		0D5040502462F3AF00A9D5E4 /* AnimatableTextLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D50404F2462F3AF00A9D5E4 /* AnimatableTextLayer.swift */; };
 		0D85512624640E15005DF06F /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D85512524640E15005DF06F /* UIView+Extension.swift */; };
 		0D933F6F248C36EB00677F1F /* UIVisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D933F6E248C36EB00677F1F /* UIVisualEffectView.swift */; };
+		0DD7B5D724A641530028E383 /* ReanimatableLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD7B5D624A641530028E383 /* ReanimatableLayer.swift */; };
 		0DE9648A245D7CD500B1E8B4 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE96489245D7CD500B1E8B4 /* MainView.swift */; };
 /* End PBXBuildFile section */
 
@@ -47,6 +48,7 @@
 		0D50404F2462F3AF00A9D5E4 /* AnimatableTextLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatableTextLayer.swift; sourceTree = "<group>"; };
 		0D85512524640E15005DF06F /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		0D933F6E248C36EB00677F1F /* UIVisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIVisualEffectView.swift; sourceTree = "<group>"; };
+		0DD7B5D624A641530028E383 /* ReanimatableLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReanimatableLayer.swift; sourceTree = "<group>"; };
 		0DE96489245D7CD500B1E8B4 /* MainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -121,6 +123,7 @@
 				0D34C23B2456FF0F00C71396 /* BubleLayer.swift */,
 				0D34C23D2456FF0F00C71396 /* FillLayer.swift */,
 				0D34C23E2456FF0F00C71396 /* TextLayer.swift */,
+				0DD7B5D624A641530028E383 /* ReanimatableLayer.swift */,
 				0D50404F2462F3AF00A9D5E4 /* AnimatableTextLayer.swift */,
 				0D0554B52466CE3B00054EB1 /* AnimationInfo.swift */,
 			);
@@ -224,6 +227,7 @@
 				0D34C2412456FF0F00C71396 /* UnblurLayer.swift in Sources */,
 				0D34C2442456FF0F00C71396 /* SuggestionConfig.swift in Sources */,
 				0D933F6F248C36EB00677F1F /* UIVisualEffectView.swift in Sources */,
+				0DD7B5D724A641530028E383 /* ReanimatableLayer.swift in Sources */,
 				0D34C2452456FF0F00C71396 /* BubleLayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

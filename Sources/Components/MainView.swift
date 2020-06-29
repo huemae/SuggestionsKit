@@ -63,7 +63,6 @@ class MainView: UIView {
 private extension MainView {
     
     func configureConstraints(parent: UIView) {
-        
         topAnchor.constraint(equalTo: parent.topAnchor).isActive = true
         leadingAnchor.constraint(equalTo: parent.leadingAnchor).isActive = true
         trailingAnchor.constraint(equalTo: parent.trailingAnchor).isActive = true

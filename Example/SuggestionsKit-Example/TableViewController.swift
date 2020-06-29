@@ -54,6 +54,9 @@ class TableViewController: UITableViewController {
             case 5:
                 let config = SuggestionsConfig(text: .init(font: UIFont.systemFont(ofSize: 30, weight: .bold)))
                 return ("Different fonts", config)
+            case 6:
+                let config = SuggestionsConfig.init(buble: .init(shadowColor: .white, shadowRadius: 10, shadowOpacity: 1.0, shadowOffset: .zero))
+                return ("Buble glow", config)
             
             default:
                 let config = SuggestionsConfig()

@@ -115,11 +115,12 @@ private extension TextLayer {
         
         layer.updateNextAnimationDuration(duration: animationDuration)
         
+        let superlayerYTransform = layer.superlayer?.presentation()?.affineTransform().ty ?? 0
         
         let finalPoint = CGPoint(x: newFrame.midX, y: newFrame.midY)
         let finalPosition = NSValue(cgPoint: finalPoint)
 
-        let fromPosition = layer.position == .zero ? finalPosition : NSValue(cgPoint: layer.position)
+        let fromPosition = layer.position == .zero ? finalPosition : NSValue(cgPoint: layer.position.applying(.init(translationX: 0, y: superlayerYTransform)))
         
         layer.updateInfo(text: newString, size: .init(lines: size.lines, size: size.size, alignment: newAlignment))
         
@@ -150,11 +151,9 @@ private extension TextLayer {
             transformAnimation.keyTimes = [0, 0.5, 1]
             layer.add(transformAnimation, forKey: "transformAnimation")
         }
-        
     }
     
     func commonInit(parent: CALayer, config: SuggestionsConfig) {
-        
         layer.contentsScale = UIScreen.main.scale
         layer.isWrapped = true
         layer.truncationMode = .none
@@ -163,5 +162,4 @@ private extension TextLayer {
         
         parent.addSublayer(self.layer)
     }
-    
 }

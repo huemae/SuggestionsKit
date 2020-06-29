@@ -34,7 +34,7 @@ class SuggestionsObject: NSObject {
         static let bubleOffset: CGFloat = 10.0
         static let minimalCornerRadius: CGFloat = 5.0
         static let holeOverdrawAmount: CGFloat = 10.0
-        static let textDrawingSuperviewOffset: CGFloat = 10.0
+        static let textDrawingSuperviewOffset: CGFloat = 20.0
     }
     
     private var fillLayer: FillLayer?

@@ -59,7 +59,13 @@ private extension BubleLayer {
         
         if isTailAbove {
             path.move(to: CGPoint(x: rect.minX, y: rect.minY))
-            let drawX = sugFrame.midX
+            var drawX = sugFrame.midX
+            
+            let tailRightPoint = drawX + triangleHeight * 1.5
+            
+//            if tailRightPoint > rect.maxX {
+//                drawX -= tailRightPoint - rect.maxX
+//            }
             
             path.addLine(to: CGPoint(x: drawX - triangleHeight * 1.5, y: rect.minY))
             path.addLine(to: CGPoint(x: drawX, y: rect.minY - triangleHeight))
@@ -77,7 +83,13 @@ private extension BubleLayer {
             path.addArc(withCenter: CGPoint(x: rect.minX, y: rect.maxY - radius), radius: radius, startAngle: CGFloat(Double.pi / 2), endAngle: CGFloat(Double.pi), clockwise: true)
             path.addArc(withCenter: CGPoint(x: rect.minX, y: rect.minY + radius), radius: radius, startAngle: CGFloat(Double.pi), endAngle: CGFloat(-Double.pi / 2), clockwise: true)
         } else {
-            let drawX = sugFrame.midX
+            var drawX = sugFrame.midX
+            
+            let tailLeftPoint = drawX - triangleHeight  * 1.5
+            
+//            if tailLeftPoint > rect.minX {
+//                drawX -= tailLeftPoint - rect.minX
+//            }
             
             path.move(to: CGPoint(x: rect.minX, y: rect.minY))
             
@@ -97,7 +109,12 @@ private extension BubleLayer {
         }
         
         path.close()
-        let oldPath = layer.path ?? path.cgPath
+        
+        let oldUntransformedPath = layer.path ?? path.cgPath
+        let currentTranslation = layer.presentation()?.affineTransform().ty ?? 0
+        let oldBezierPath = UIBezierPath(cgPath: oldUntransformedPath)
+        oldBezierPath.apply(.init(translationX: 0, y: currentTranslation))
+        let oldPath = oldBezierPath.cgPath
         
         let animations: [AnimationInfo] = [
             .init(key: #keyPath(CAShapeLayer.path), fromValue: oldPath, toValue: path.cgPath),
@@ -133,45 +150,12 @@ private extension BubleLayer {
         layer.strokeColor = config.buble.borderColor.cgColor
         layer.lineWidth = config.buble.borderWidth
         layer.fillColor = config.buble.backgroundColor.cgColor
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowRadius = 10
-        layer.shadowOpacity = 0.5
-        layer.shadowOffset = CGSize(width: 1, height: 1)
+        layer.shadowColor = config.buble.shadowColor.cgColor
+        layer.shadowRadius = config.buble.shadowRadius
+        layer.shadowOpacity = Float(config.buble.shadowOpacity)
+        layer.shadowOffset = config.buble.shadowOffset
         layer.name = String(describing: self)
         
         parent.addSublayer(layer)
-    }
-}
-
-
-class ReanimatableLayer: CAShapeLayer {
-    
-    private var tempAnimation: CAAnimation?
-    private var tempAnimationKey: String?
-    
-    override init() {
-        super.init()
-        NotificationCenter.default.addObserver(self, selector: #selector(back), name: UIApplication.didEnterBackgroundNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(front), name: UIApplication.didBecomeActiveNotification, object: nil)
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    @objc func back() {
-        let anim = animationKeys()?.compactMap { (animation(forKey: $0), $0) }.first
-        removeAllAnimations()
-        tempAnimationKey = anim?.1
-        tempAnimation = anim?.0?.mutableCopy() as? CAAnimation
-    }
-    
-    @objc func front() {
-        guard let anim = tempAnimation, let key = tempAnimationKey else { return }
-        add(anim, forKey: key)
     }
 }
