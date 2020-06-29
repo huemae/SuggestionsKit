@@ -1,6 +1,7 @@
 # SuggestionsKit
 
 ![SuggestionsKit](https://i.imgur.com/Z9SfxiO.gif)
+<img src="https://i.imgur.com/xfGnJ90.gif" width="100" height="100">
 
 [![CI Status](https://travis-ci.org/huemae/SuggestionsKit.svg?branch=master)](https://travis-ci.org/huemae/SuggestionsKit)
 [![Version](https://img.shields.io/cocoapods/v/SuggestionsKit.svg?style=flat)](https://cocoapods.org/pods/SuggestionsKit)
