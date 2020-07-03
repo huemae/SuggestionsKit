@@ -63,9 +63,9 @@ private extension BubleLayer {
             
             let tailRightPoint = drawX + triangleHeight * 1.5
             
-//            if tailRightPoint > rect.maxX {
-//                drawX -= tailRightPoint - rect.maxX
-//            }
+            if tailRightPoint > rect.maxX {
+                drawX -= tailRightPoint - rect.maxX
+            }
             
             path.addLine(to: CGPoint(x: drawX - triangleHeight * 1.5, y: rect.minY))
             path.addLine(to: CGPoint(x: drawX, y: rect.minY - triangleHeight))
@@ -87,9 +87,9 @@ private extension BubleLayer {
             
             let tailLeftPoint = drawX - triangleHeight  * 1.5
             
-//            if tailLeftPoint > rect.minX {
-//                drawX -= tailLeftPoint - rect.minX
-//            }
+            if tailLeftPoint < rect.minX {
+                drawX -= tailLeftPoint - rect.minX
+            }
             
             path.move(to: CGPoint(x: rect.minX, y: rect.minY))
             

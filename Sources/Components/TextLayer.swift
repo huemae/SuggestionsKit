@@ -51,7 +51,7 @@ private extension TextLayer {
     func internalUpdate(boundsForDrawing: CGRect, maxTextWidth: CGFloat, suggestion: Suggestion, animationDuration: TimeInterval) {
         let attrs = [NSAttributedString.Key.font: config.text.font, NSAttributedString.Key.foregroundColor: config.text.textColor]
         let newString = NSAttributedString(string: suggestion.text, attributes: attrs)
-        let size = suggestion.text.calculateHeight(textFont: config.text.font, maxWidth: maxTextWidth)
+        let size = suggestion.text.calculateHeight(config: config.text, maxWidth: maxTextWidth)
         let newSize = size.size
         
         let suggFrame: CGRect = suggestionFrameClosue?(suggestion) ?? .zero

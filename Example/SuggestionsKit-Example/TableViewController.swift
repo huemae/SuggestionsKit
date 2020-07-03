@@ -42,9 +42,8 @@ class TableViewController: UITableViewController {
                 let config = SuggestionsConfig(background: SuggestionsConfig.Background(blurred: false))
                 return ("Unblurred", config)
             case 2:
-                let config = SuggestionsConfig(buble: SuggestionsConfig.BubleConfig(shouldDraw: false),
-                                               text: .init(textColor: .white), shouldBounceAfterMove: false)
-                return ("Without buble", config)
+                let config = SuggestionsConfig(shouldBounceAfterMove: false)
+                return ("Without bounce", config)
             case 3:
                 let config = SuggestionsConfig(animationsTimingFunction: .easeInEaseOut)
                 return ("Different timing function", config)
@@ -55,7 +54,7 @@ class TableViewController: UITableViewController {
                 let config = SuggestionsConfig(text: .init(font: UIFont.systemFont(ofSize: 30, weight: .bold)))
                 return ("Different fonts", config)
             case 6:
-                let config = SuggestionsConfig.init(buble: .init(shadowColor: .white, shadowRadius: 10, shadowOpacity: 1.0, shadowOffset: .zero))
+                let config = SuggestionsConfig(buble: .init(shadowColor: .white, shadowRadius: 10, shadowOpacity: 1.0, shadowOffset: .zero), text: .init(textColor: UIColor.darkGray, font: .systemFont(ofSize: 12, weight: .regular)))
                 return ("Buble glow", config)
             
             default:

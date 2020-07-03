@@ -263,7 +263,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Example" id="juR-ZZ-PTw">
                         <rightBarButtonItems>
-                            <barButtonItem tag="2020" systemItem="refresh" id="i4h-cn-eaN">
+                            <barButtonItem systemItem="refresh" id="i4h-cn-eaN">
                                 <connections>
                                     <action selector="refreshButtonPressed:" destination="BYZ-38-t0r" id="Jd3-SY-LlD"/>
                                 </connections>

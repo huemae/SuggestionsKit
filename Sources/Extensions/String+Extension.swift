@@ -55,10 +55,11 @@ extension String {
         return floor(value * Self.screenScale) / Self.screenScale
     }
     
-    func calculateHeight(textFont: UIFont, maxWidth: CGFloat) -> TextSizeItem {
+    func calculateHeight(config: SuggestionsConfig.TextConfig, maxWidth: CGFloat) -> TextSizeItem {
         
         let constrainedSize: CGSize = .init(width: maxWidth, height: .greatestFiniteMagnitude)
-        let attributedString = NSAttributedString(string: self, attributes: [NSAttributedString.Key.font: textFont])
+        let textFont = config.font
+        let attributedString = NSAttributedString(string: self, attributes: [NSAttributedString.Key.font: textFont, NSAttributedString.Key.foregroundColor: config.textColor])
         let stringLength = attributedString.length
         
         let font: CTFont
