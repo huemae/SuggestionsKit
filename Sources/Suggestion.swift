@@ -29,10 +29,14 @@ import UIKit
 
 @objc public class Suggestion: NSObject {
     weak var view: UIView?
-    let text: String
+    let text: String?
+	let frame: CGRect?
+	let attributedText: NSAttributedString?
     
-    public init(view: UIView, text: String) {
+	public init(view: UIView? = nil, frame: CGRect? = nil, text: String? = nil, attributedText: NSAttributedString? = nil) {
         self.view = view
         self.text = text
+		self.frame = frame
+		self.attributedText = attributedText
     }
 }

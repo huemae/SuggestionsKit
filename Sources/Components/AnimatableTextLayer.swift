@@ -32,7 +32,7 @@ class AnimatableTextLayer: CATextLayer {
     private var config: SuggestionsConfig
     private var animationDuration: TimeInterval = 0
     private var nextString: NSAttributedString = .init()
-    private var nextSize: String.TextSizeItem = .init(lines: [], size: .zero, alignment: .left)
+    private var nextSize: StringSizeCalculator.TextSizeItem = .init(lines: [], size: .zero, alignment: .left)
     
     init(with config: SuggestionsConfig) {
         let layer = CATextLayer()
@@ -107,7 +107,7 @@ class AnimatableTextLayer: CATextLayer {
         animationDuration = duration
     }
     
-    func updateInfo(text: NSAttributedString, size: String.TextSizeItem) {
+    func updateInfo(text: NSAttributedString, size: StringSizeCalculator.TextSizeItem) {
         nextSize = size
         nextString = text
         setNeedsDisplay()
@@ -121,5 +121,10 @@ class AnimatableTextLayer: CATextLayer {
         anim.fillMode = .forwards
         
         return anim
+    }
+    
+    override func removeAnimation(forKey key: String) {
+        super.removeAnimation(forKey: key)
+        
     }
 }

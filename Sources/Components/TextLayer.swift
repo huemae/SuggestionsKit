@@ -47,11 +47,23 @@ class TextLayer {
 }
 
 private extension TextLayer {
+	
+	func attributedString(from suggestion: Suggestion) -> NSAttributedString {
+		if let attributed = suggestion.attributedText {
+			return attributed
+		} else if let text = suggestion.text {
+			let attrs = [NSAttributedString.Key.font: config.text.font, NSAttributedString.Key.foregroundColor: config.text.textColor]
+			return NSAttributedString(string: text, attributes: attrs)
+		}
+		
+		return .init()
+	}
 
     func internalUpdate(boundsForDrawing: CGRect, maxTextWidth: CGFloat, suggestion: Suggestion, animationDuration: TimeInterval) {
-        let attrs = [NSAttributedString.Key.font: config.text.font, NSAttributedString.Key.foregroundColor: config.text.textColor]
-        let newString = NSAttributedString(string: suggestion.text, attributes: attrs)
-        let size = suggestion.text.calculateHeight(config: config.text, maxWidth: maxTextWidth)
+        let newString = attributedString(from: suggestion)
+		let calculator = StringSizeCalculator(suggestion: suggestion, config: config.text)
+		
+        let size = calculator.calculateHeight(maxWidth: maxTextWidth)
         let newSize = size.size
         
         let suggFrame: CGRect = suggestionFrameClosue?(suggestion) ?? .zero

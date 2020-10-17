@@ -48,7 +48,7 @@ final public class SuggestionsManager {
         shared = SuggestionsManager()
         shared?.suggestionsOverlay?.suggestionsFinished()
         shared?.suggestions = suggestions
-            .filter { $0.view?.superview != nil }
+			.filter { $0.view?.superview != nil || $0.frame != nil }
         
         return SuggestionsManager.self
     }
@@ -86,7 +86,7 @@ private extension SuggestionsManager {
     }
     
     func updateSuggestion() {
-        guard let sug = suggestions.filter({ $0.view != nil }).first else {
+		guard let sug = suggestions.filter({ $0.view != nil  || $0.frame != nil }).first else {
             suggestionsOverlay?.updateForSuggestion(suggestion: nil)
             suggestionsOverlay?.suggestionsFinished()
             suggestionsOverlay = nil

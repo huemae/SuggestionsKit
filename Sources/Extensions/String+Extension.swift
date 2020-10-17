@@ -26,176 +26,196 @@
 import Foundation
 import UIKit
 
-
-extension String {
-    
-    final class TextNodeLine {
-        let line: CTLine
-        let frame: CGRect
-        let range: NSRange
-        let isRTL: Bool
-        
-        init(line: CTLine, frame: CGRect, range: NSRange, isRTL: Bool) {
-            self.line = line
-            self.frame = frame
-            self.range = range
-            self.isRTL = isRTL
-        }
-    }
-    
-    struct TextSizeItem {
-        let lines: [TextNodeLine]
-        let size: CGSize
-        let alignment: NSTextAlignment
-    }
-    
-    static var screenScale = UIScreen.main.scale
-    
-    func floorToScreenPixels(_ value: CGFloat) -> CGFloat {
-        return floor(value * Self.screenScale) / Self.screenScale
-    }
-    
-    func calculateHeight(config: SuggestionsConfig.TextConfig, maxWidth: CGFloat) -> TextSizeItem {
-        
-        let constrainedSize: CGSize = .init(width: maxWidth, height: .greatestFiniteMagnitude)
-        let textFont = config.font
-        let attributedString = NSAttributedString(string: self, attributes: [NSAttributedString.Key.font: textFont, NSAttributedString.Key.foregroundColor: config.textColor])
-        let stringLength = attributedString.length
-        
-        let font: CTFont
-        if stringLength != 0 {
-            if let stringFont = attributedString.attribute(NSAttributedString.Key.font, at: 0, effectiveRange: nil) {
-                font = stringFont as! CTFont
-            } else {
-                font = textFont
-            }
-        } else {
-            font = textFont
-        }
-        let lineSpacingFactor: CGFloat = 0.12
-        let maximumNumberOfLines = 0
-        let fontAscent = CTFontGetAscent(font)
-        let fontDescent = CTFontGetDescent(font)
-        let fontLineHeight = floor(fontAscent + fontDescent)
-        let fontLineSpacing = floor(fontLineHeight * lineSpacingFactor)
-        let truncationType: CTLineTruncationType = .end
-        
-        var maybeTypesetter: CTTypesetter?
-        maybeTypesetter = CTTypesetterCreateWithAttributedString(attributedString as CFAttributedString)
-        
-        let typesetter = maybeTypesetter!
-        var lastLineCharacterIndex: CFIndex = 0
-        var layoutSize = CGSize()
-        
-        var first = true
-        var linesCount = 0
-        var lines: [TextNodeLine] = []
-        while true {
-            let lineConstrainedWidth = constrainedSize.width
-            var lineOriginY = floorToScreenPixels(layoutSize.height + fontAscent)
-            if !first {
-                lineOriginY += fontLineSpacing
-            }
-            let lineAdditionalWidth: CGFloat = 0.0
-            let lineCutoutOffset: CGFloat = 0.0
-            
-            let lineCharacterCount = CTTypesetterSuggestLineBreak(typesetter, lastLineCharacterIndex, Double(lineConstrainedWidth))
-            
-            var isLastLine = false
-            if maximumNumberOfLines != 0 && linesCount == maximumNumberOfLines - 1 && lineCharacterCount > 0 {
-                isLastLine = true
-            } else if layoutSize.height + (fontLineSpacing + fontLineHeight) * 2.0 > constrainedSize.height {
-                isLastLine = true
-            }
-            
-            if isLastLine {
-                if first {
-                    first = false
-                } else {
-                    layoutSize.height += fontLineSpacing
-                }
-                
-                let lineRange = CFRange(location: lastLineCharacterIndex, length: stringLength - lastLineCharacterIndex)
-                
-                if lineRange.length == 0 {
-                    break
-                }
-                
-                let coreTextLine: CTLine
-                
-                let originalLine = CTTypesetterCreateLineWithOffset(typesetter, lineRange, 0.0)
-                
-                if CTLineGetTypographicBounds(originalLine, nil, nil, nil) - CTLineGetTrailingWhitespaceWidth(originalLine) < Double(constrainedSize.width) {
-                    coreTextLine = originalLine
-                } else {
-                    var truncationTokenAttributes: [NSAttributedString.Key : AnyObject] = [:]
-                    truncationTokenAttributes[NSAttributedString.Key.font] = font
-                    truncationTokenAttributes[NSAttributedString.Key(rawValue:  kCTForegroundColorFromContextAttributeName as String)] = true as NSNumber
-                    let tokenString = "\u{2026}"
-                    let truncatedTokenString = NSAttributedString(string: tokenString, attributes: truncationTokenAttributes)
-                    let truncationToken = CTLineCreateWithAttributedString(truncatedTokenString)
-                    
-                    coreTextLine = CTLineCreateTruncatedLine(originalLine, Double(constrainedSize.width), truncationType, truncationToken) ?? truncationToken
-                }
-                
-                let lineWidth = min(constrainedSize.width, ceil(CGFloat(CTLineGetTypographicBounds(coreTextLine, nil, nil, nil) - CTLineGetTrailingWhitespaceWidth(coreTextLine))))
-                let lineFrame = CGRect(x: lineCutoutOffset, y: lineOriginY, width: lineWidth, height: fontLineHeight)
-                layoutSize.height += fontLineHeight + fontLineSpacing
-                layoutSize.width = max(layoutSize.width, lineWidth + lineAdditionalWidth)
-                linesCount += 1
-                
-                var isRTL = false
-                let glyphRuns = CTLineGetGlyphRuns(coreTextLine) as NSArray
-                if glyphRuns.count != 0 {
-                    let run = glyphRuns[0] as! CTRun
-                    if CTRunGetStatus(run).contains(CTRunStatus.rightToLeft) {
-                        isRTL = true
-                    }
-                }
-                
-                lines.append(TextNodeLine(line: coreTextLine, frame: lineFrame, range: NSMakeRange(lineRange.location, lineRange.length), isRTL: isRTL))
-                
-                break
-            } else {
-                if lineCharacterCount > 0 {
-                    if first {
-                        first = false
-                    } else {
-                        layoutSize.height += fontLineSpacing
-                    }
-                    
-                    let lineRange = CFRangeMake(lastLineCharacterIndex, lineCharacterCount)
-                    let coreTextLine = CTTypesetterCreateLineWithOffset(typesetter, lineRange, 100.0)
-                    lastLineCharacterIndex += lineCharacterCount
-                    
-                    let lineWidth = ceil(CGFloat(CTLineGetTypographicBounds(coreTextLine, nil, nil, nil) - CTLineGetTrailingWhitespaceWidth(coreTextLine)))
-                    layoutSize.height += fontLineHeight
-                    layoutSize.width = max(layoutSize.width, lineWidth + lineAdditionalWidth)
-                    linesCount += 1
-                    
-                    let lineFrame = CGRect(x: lineCutoutOffset, y: lineOriginY, width: lineWidth, height: fontLineHeight)
-                    
-                    var isRTL = false
-                    let glyphRuns = CTLineGetGlyphRuns(coreTextLine) as NSArray
-                    if glyphRuns.count != 0 {
-                        let run = glyphRuns[0] as! CTRun
-                        if CTRunGetStatus(run).contains(CTRunStatus.rightToLeft) {
-                            isRTL = true
-                        }
-                    }
-                    
-                    lines.append(TextNodeLine(line: coreTextLine, frame: lineFrame, range: NSMakeRange(lineRange.location, lineRange.length), isRTL: isRTL))
-                    
-                } else {
-                    if linesCount > 0 {
-                        layoutSize.height += fontLineSpacing
-                    }
-                    break
-                }
-            }
-        }
-        let size = CGSize(width: ceil(layoutSize.width), height: ceil(layoutSize.height))
-        
-        return TextSizeItem(lines: lines, size: size, alignment: .left)
-    }
+class StringSizeCalculator {
+	
+	final class TextNodeLine {
+		let line: CTLine
+		let frame: CGRect
+		let range: NSRange
+		let isRTL: Bool
+		
+		init(line: CTLine, frame: CGRect, range: NSRange, isRTL: Bool) {
+			self.line = line
+			self.frame = frame
+			self.range = range
+			self.isRTL = isRTL
+		}
+	}
+	
+	struct TextSizeItem {
+		let lines: [TextNodeLine]
+		let size: CGSize
+		let alignment: NSTextAlignment
+	}
+	
+	static var screenScale = UIScreen.main.scale
+	
+	
+	let suggestion: Suggestion
+	let config: SuggestionsConfig.TextConfig
+	
+	init(suggestion: Suggestion, config: SuggestionsConfig.TextConfig) {
+		self.suggestion = suggestion
+		self.config = config
+	}
+	
+	func floorToScreenPixels(_ value: CGFloat) -> CGFloat {
+		return floor(value * Self.screenScale) / Self.screenScale
+	}
+	
+	func makeAttributedString() -> NSAttributedString {
+		if let attr = suggestion.attributedText {
+			return attr
+		} else if let text = suggestion.text {
+			return NSAttributedString(string: text,
+									  attributes: [NSAttributedString.Key.font: config.font,
+												   NSAttributedString.Key.foregroundColor: config.textColor])
+		}
+		
+		return .init()
+	}
+	
+	func calculateHeight(maxWidth: CGFloat) -> TextSizeItem {
+		
+		let constrainedSize: CGSize = .init(width: maxWidth, height: .greatestFiniteMagnitude)
+		let textFont = config.font
+		let attributedString = makeAttributedString()
+		let stringLength = attributedString.length
+		
+		let font: CTFont
+		if stringLength != 0 {
+			if let stringFont = attributedString.attribute(NSAttributedString.Key.font, at: 0, effectiveRange: nil) {
+				font = stringFont as! CTFont
+			} else {
+				font = textFont
+			}
+		} else {
+			font = textFont
+		}
+		let lineSpacingFactor: CGFloat = 0.12
+		let maximumNumberOfLines = 0
+		let fontAscent = CTFontGetAscent(font)
+		let fontDescent = CTFontGetDescent(font)
+		let fontLineHeight = floor(fontAscent + fontDescent)
+		let fontLineSpacing = floor(fontLineHeight * lineSpacingFactor)
+		let truncationType: CTLineTruncationType = .end
+		
+		var maybeTypesetter: CTTypesetter?
+		maybeTypesetter = CTTypesetterCreateWithAttributedString(attributedString as CFAttributedString)
+		
+		let typesetter = maybeTypesetter!
+		var lastLineCharacterIndex: CFIndex = 0
+		var layoutSize = CGSize()
+		
+		var first = true
+		var linesCount = 0
+		var lines: [TextNodeLine] = []
+		while true {
+			let lineConstrainedWidth = constrainedSize.width
+			var lineOriginY = floorToScreenPixels(layoutSize.height + fontAscent)
+			if !first {
+				lineOriginY += fontLineSpacing
+			}
+			let lineAdditionalWidth: CGFloat = 0.0
+			let lineCutoutOffset: CGFloat = 0.0
+			
+			let lineCharacterCount = CTTypesetterSuggestLineBreak(typesetter, lastLineCharacterIndex, Double(lineConstrainedWidth))
+			
+			var isLastLine = false
+			if maximumNumberOfLines != 0 && linesCount == maximumNumberOfLines - 1 && lineCharacterCount > 0 {
+				isLastLine = true
+			} else if layoutSize.height + (fontLineSpacing + fontLineHeight) * 2.0 > constrainedSize.height {
+				isLastLine = true
+			}
+			
+			if isLastLine {
+				if first {
+					first = false
+				} else {
+					layoutSize.height += fontLineSpacing
+				}
+				
+				let lineRange = CFRange(location: lastLineCharacterIndex, length: stringLength - lastLineCharacterIndex)
+				
+				if lineRange.length == 0 {
+					break
+				}
+				
+				let coreTextLine: CTLine
+				
+				let originalLine = CTTypesetterCreateLineWithOffset(typesetter, lineRange, 0.0)
+				
+				if CTLineGetTypographicBounds(originalLine, nil, nil, nil) - CTLineGetTrailingWhitespaceWidth(originalLine) < Double(constrainedSize.width) {
+					coreTextLine = originalLine
+				} else {
+					var truncationTokenAttributes: [NSAttributedString.Key : AnyObject] = [:]
+					truncationTokenAttributes[NSAttributedString.Key.font] = font
+					truncationTokenAttributes[NSAttributedString.Key(rawValue:  kCTForegroundColorFromContextAttributeName as String)] = true as NSNumber
+					let tokenString = "\u{2026}"
+					let truncatedTokenString = NSAttributedString(string: tokenString, attributes: truncationTokenAttributes)
+					let truncationToken = CTLineCreateWithAttributedString(truncatedTokenString)
+					
+					coreTextLine = CTLineCreateTruncatedLine(originalLine, Double(constrainedSize.width), truncationType, truncationToken) ?? truncationToken
+				}
+				
+				let lineWidth = min(constrainedSize.width, ceil(CGFloat(CTLineGetTypographicBounds(coreTextLine, nil, nil, nil) - CTLineGetTrailingWhitespaceWidth(coreTextLine))))
+				let lineFrame = CGRect(x: lineCutoutOffset, y: lineOriginY, width: lineWidth, height: fontLineHeight)
+				layoutSize.height += fontLineHeight + fontLineSpacing
+				layoutSize.width = max(layoutSize.width, lineWidth + lineAdditionalWidth)
+				linesCount += 1
+				
+				var isRTL = false
+				let glyphRuns = CTLineGetGlyphRuns(coreTextLine) as NSArray
+				if glyphRuns.count != 0 {
+					let run = glyphRuns[0] as! CTRun
+					if CTRunGetStatus(run).contains(CTRunStatus.rightToLeft) {
+						isRTL = true
+					}
+				}
+				
+				lines.append(TextNodeLine(line: coreTextLine, frame: lineFrame, range: NSMakeRange(lineRange.location, lineRange.length), isRTL: isRTL))
+				
+				break
+			} else {
+				if lineCharacterCount > 0 {
+					if first {
+						first = false
+					} else {
+						layoutSize.height += fontLineSpacing
+					}
+					
+					let lineRange = CFRangeMake(lastLineCharacterIndex, lineCharacterCount)
+					let coreTextLine = CTTypesetterCreateLineWithOffset(typesetter, lineRange, 100.0)
+					lastLineCharacterIndex += lineCharacterCount
+					
+					let lineWidth = ceil(CGFloat(CTLineGetTypographicBounds(coreTextLine, nil, nil, nil) - CTLineGetTrailingWhitespaceWidth(coreTextLine)))
+					layoutSize.height += fontLineHeight
+					layoutSize.width = max(layoutSize.width, lineWidth + lineAdditionalWidth)
+					linesCount += 1
+					
+					let lineFrame = CGRect(x: lineCutoutOffset, y: lineOriginY, width: lineWidth, height: fontLineHeight)
+					
+					var isRTL = false
+					let glyphRuns = CTLineGetGlyphRuns(coreTextLine) as NSArray
+					if glyphRuns.count != 0 {
+						let run = glyphRuns[0] as! CTRun
+						if CTRunGetStatus(run).contains(CTRunStatus.rightToLeft) {
+							isRTL = true
+						}
+					}
+					
+					lines.append(TextNodeLine(line: coreTextLine, frame: lineFrame, range: NSMakeRange(lineRange.location, lineRange.length), isRTL: isRTL))
+					
+				} else {
+					if linesCount > 0 {
+						layoutSize.height += fontLineSpacing
+					}
+					break
+				}
+			}
+		}
+		let size = CGSize(width: ceil(layoutSize.width), height: ceil(layoutSize.height))
+		
+		return TextSizeItem(lines: lines, size: size, alignment: .left)
+	}
 }

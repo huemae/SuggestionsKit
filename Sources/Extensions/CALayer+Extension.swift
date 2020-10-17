@@ -29,16 +29,9 @@ import UIKit
 
 extension CALayer {
     
-    func removeAnimations(items: [AnimationInfo]) {
-        for item in items {
-            removeAnimation(forKey: item.key)
-        }
-    }
-    
     func perfrormAnimation(items: [AnimationInfo], timing: CAMediaTimingFunctionName, duration: TimeInterval, fillMode: CAMediaTimingFillMode, changeValuesClosure: () -> (), completion: (() -> ())? = nil) {
         let keys = items.map { $0.key }.joined(separator: "-")
         let group = CAAnimationGroup()
-        group.isRemovedOnCompletion = true
         group.animations = []
         group.timingFunction = CAMediaTimingFunction(name: timing)
         group.duration = duration
@@ -57,13 +50,9 @@ extension CALayer {
         changeValuesClosure()
         
         CATransaction.begin()
-        CATransaction.setCompletionBlock { [weak self] in
-            self?.removeAnimations(items: items)
-            completion?()
-        }
+        CATransaction.setCompletionBlock(completion)
         add(group, forKey: keys)
         CATransaction.commit()
-
     }
 }
 

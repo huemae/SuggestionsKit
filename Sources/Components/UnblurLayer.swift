@@ -53,14 +53,14 @@ class UnblurLayer {
     }
     
     func updateUnblur(suggestion: Suggestion, holeRect: CGRect, animationDuration: TimeInterval) {
-        guard let view = suggestion.view else { return }
         let biggerRect = CGRect(x: layer.frame.origin.x, y: layer.frame.origin.y, width: layer.frame.size.width, height: layer.frame.size.height)
         let smallerRect = holeRect
         
         let finalRadius: CGFloat = {
-            let sugRadius = view.layer.cornerRadius
+			let sugRadius = suggestion.view?.layer.cornerRadius ?? 0
             if sugRadius > 0 {
-                if sugRadius == view.frame.size.height / 2 {
+				let height = (suggestion.view?.frame.size.height ?? suggestion.frame?.size.height) ?? 0
+                if sugRadius == height / 2 {
                     return holeRect.width / 2
                 }
                 return sugRadius

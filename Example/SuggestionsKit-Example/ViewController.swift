@@ -70,11 +70,21 @@ class ViewController: UIViewController {
             let navItems = SuggestionsHelper.findAllBarItems(in: navigationController?.navigationBar)
             let navSuggestions = navItems.enumerated()
                 .map { Suggestion(view: $0.element, text: $0.offset == 0 ? "back button" : "bar button item") }
+			let exampleAttrString1 = NSAttributedString(string: "frame suggestion #1",
+													   attributes: [.font: UIFont.systemFont(ofSize: 25, weight: .thin),
+																	.foregroundColor: UIColor.lightGray])
+			let exampleAttrString2 = NSAttributedString(string: "frame suggestion #2",
+													   attributes: [.font: UIFont.systemFont(ofSize: 25, weight: .thin),
+																	.foregroundColor: UIColor.lightGray])
+			let frameSuggestion1 = Suggestion(frame: .init(x: 100, y: 0, width: view.frame.width - 200, height: view.frame.height / 2), attributedText: exampleAttrString1)
+			let frameSuggestion2 = Suggestion(frame: .init(x: 100, y: view.frame.height / 2, width: view.frame.width - 200, height: view.frame.height / 2), attributedText: exampleAttrString2)
             suggestions += navSuggestions
+			suggestions.append(frameSuggestion1)
+			suggestions.append(frameSuggestion2)
         }
         
         
-        SuggestionsManager.apply(suggestions)
+		SuggestionsManager.apply(suggestions)
             .configre(config)
             .startShowing()
             .completion {

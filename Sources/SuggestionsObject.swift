@@ -173,13 +173,14 @@ private extension SuggestionsObject {
         hashTable.add(newObs22)
     }
     
-    func removeObservingAtLastSuggested() {
-    }
-    
     func frame(of suggestion: Suggestion) -> CGRect {
-        guard let superview = mainView?.superview, let view = suggestion.view else { return .zero }
-        let newOrigin = view.convert(superview.frame, to: nil).origin
-        return CGRect(x: newOrigin.x, y: newOrigin.y, width: view.frame.width, height: view.frame.height)
+        guard let superview = mainView?.superview else { return .zero }
+		if let view = suggestion.view {
+			let newOrigin = view.convert(superview.frame, to: nil).origin
+			return CGRect(x: newOrigin.x, y: newOrigin.y, width: view.frame.width, height: view.frame.height)
+		} else {
+			return suggestion.frame ?? .zero
+		}
     }
     
     func maxWidthToDrawText() -> CGFloat {
