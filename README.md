@@ -32,10 +32,12 @@ Import ```SuggestionsKit```
 import SuggestionsKit
 ```
 
-Next you need to create one or more suggestions. Simple init method takes ```UIVIew``` and ```String ``` as arguments.
+Next you need to create one or more suggestions. Simple init method takes ```UIVIew```, ```CGRect ``` , ```String ``` and ```NSAttributedString ``` as arguments.
 ```swift
-let suggestion = Suggestion(view: sendMessageButton, text: "Tap here to send message to user")
+let frameSuggestion2 = Suggestion(frame: .init(x: 100, y: 100, width: 200, height: 200), attributedText: attributedString)
 ```
+If you pass ```attributedText``` then ```text``` is ignored and if you pass ```view``` then ```frame``` ignored too.  
+If you pass ```attributedText``` then ```textColor``` and ```font``` from ```SuggestionsConfig.TextConfig``` is ignored
 
 After you just call ```apply``` method of ```SuggestionManager``` class
 ```swift
