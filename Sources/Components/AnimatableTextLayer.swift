@@ -82,7 +82,9 @@ class AnimatableTextLayer: CATextLayer {
                 lineFrame.origin.x = 0
             } else if alignment == .right {
                 lineFrame.origin.x = offset.x + floor(bounds.size.width - lineFrame.width)
-            }
+			} else if alignment == .center {
+				lineFrame.origin.x = offset.x + floor(bounds.size.width - lineFrame.width) / 2
+			}
             context.textPosition = CGPoint(x: lineFrame.minX, y: lineFrame.minY)
             CTLineDraw(line.line, context)
         }

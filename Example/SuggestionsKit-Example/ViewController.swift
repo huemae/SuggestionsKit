@@ -84,7 +84,7 @@ class ViewController: UIViewController {
 		
 		
 		let paragraphStyleLeftAlign = NSMutableParagraphStyle()
-		paragraphStyleLeftAlign.alignment = .left
+		paragraphStyleLeftAlign.alignment = .center
 
 		let exampleAttrString3 = NSAttributedString(string: "frame suggestion #1 The quick brown fox jumps over the lazy dog, long text to test left align\nidea proposed by @viralsavaniIM",
 													attributes: [.font: UIFont.systemFont(ofSize: 25, weight: .thin),
