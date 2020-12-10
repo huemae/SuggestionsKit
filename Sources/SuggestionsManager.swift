@@ -34,6 +34,7 @@ final public class SuggestionsManager {
     
     private static var shared: SuggestionsManager?
     
+	private var config: SuggestionsConfig = SuggestionsConfig()
     private var suggestions: [Suggestion] = []
     private var suggestionsOverlay: SuggestionsObject?
     private var completionBlock: VoidBlock?
@@ -54,7 +55,7 @@ final public class SuggestionsManager {
     }
     
     public static func configre(_ config: SuggestionsConfig = SuggestionsConfig()) -> SuggestionsManager.Type {
-        shared?.start(config: config)
+		shared?.config = config
         
         return SuggestionsManager.self
     }
@@ -62,6 +63,7 @@ final public class SuggestionsManager {
     /// Call this method to start presentation of suggestions
     @discardableResult
     public static func startShowing() -> SuggestionsManager.Type {
+		shared?.start(config: shared?.config ?? SuggestionsConfig())
         shared?.updateSuggestion()
         
         return SuggestionsManager.self

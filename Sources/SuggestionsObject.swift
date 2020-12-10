@@ -55,35 +55,26 @@ class SuggestionsObject: NSObject {
     
     private let config: SuggestionsConfig
     
-    private var view: UIView {
-        guard let view = mainView else { preconditionFailure("") }
-        
-        return view
+    private var view: UIView? {
+        return mainView
     }
     
-    private var layer: CALayer {
-        guard let layer = mainView?.layer else { preconditionFailure("") }
-        
-        return layer
+    private var layer: CALayer? {
+		return mainView?.layer
     }
     
     private var bounds: CGRect {
-        guard let view = mainView else { preconditionFailure("") }
-        
-        return view.bounds
+		return view?.bounds ?? .zero
     }
     
     private var frame: CGRect {
-        guard let view = mainView else { preconditionFailure("") }
-        
-        return view.frame
+		return mainView?.frame ?? .zero
     }
     
     private var insets: UIEdgeInsets {
-        guard let view = mainView else { preconditionFailure("") }
         
         if #available(iOS 11.0, *) {
-            return view.safeAreaInsets
+			return mainView?.safeAreaInsets ?? .zero
         } else {
             return UIEdgeInsets.zero
         }
@@ -144,7 +135,7 @@ private extension SuggestionsObject {
     }
     
     @objc func performUpdateAfterBoundsChange() {
-        guard let suggestion = lastSuggested else { return }
+        guard let suggestion = lastSuggested, let layer = layer else { return }
         updateForSuggestion(suggestion: suggestion)
         blurLayer?.update(parent: layer, config: config)
         unblurLayer?.updateUnblur(suggestion: suggestion, holeRect: holeRect, animationDuration: holeMoveDuration)
@@ -159,6 +150,7 @@ private extension SuggestionsObject {
         let closurePoint: ((CALayer, NSKeyValueObservedChange<CGPoint>) -> Void) = { [weak self] la, value in
             self?.perfromWithDelayAndCanceling()
         }
+		guard let view = view else { return }
         let newObs = view.layer.observe(\.bounds, changeHandler: closure)
         let newObs1 = view.layer.observe(\.frame, changeHandler: closure)
         let newObs2 = view.layer.observe(\.position, changeHandler: closurePoint)
@@ -198,7 +190,7 @@ private extension SuggestionsObject {
     }
     
     func updateOverlay(suggestion: Suggestion) {
-        fillLayer?.update(suggestion: suggestion, parentBounds: layer.bounds)
+		fillLayer?.update(suggestion: suggestion, parentBounds: layer?.bounds ?? .zero)
     }
     
     func updateBuble(of suggestion: Suggestion) {
@@ -206,7 +198,7 @@ private extension SuggestionsObject {
     }
     
     func updateUnblur(suggestion: Suggestion) {
-        unblurLayer?.update(frame: layer.bounds)
+        unblurLayer?.update(frame: layer?.bounds ?? .zero)
         unblurLayer?.updateUnblur(suggestion: suggestion, holeRect: holeRect, animationDuration: holeMoveDuration)
     }
     
@@ -230,16 +222,16 @@ private extension SuggestionsObject {
     
     func configureGestures() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
-        view.addGestureRecognizer(tap)
-        view.isUserInteractionEnabled = true
+        view?.addGestureRecognizer(tap)
+        view?.isUserInteractionEnabled = true
     }
     
     func configureAppearance() {
-        view.backgroundColor = UIColor.clear
+        view?.backgroundColor = UIColor.clear
     }
     
     func configreDimmLayer(config: SuggestionsConfig) {
-        
+		guard let layer = layer else { return }
         let dimm = FillLayer(parent: layer, config: config)
         dimm.holeMoveDurationUpdatedClosue = { [weak self] duration in
             self?.holeMoveDuration = duration
@@ -258,7 +250,7 @@ private extension SuggestionsObject {
     }
     
     func configureBubleLayer(config: SuggestionsConfig) -> CALayer? {
-        guard config.buble.shouldDraw else { return nil }
+		guard config.buble.shouldDraw, let layer = layer else { return nil }
         var tempLayer: CALayer?
         let buble = BubleLayer(parent: layer, config: config, tempLayerClosure: { layer in
             tempLayer = layer
@@ -269,7 +261,7 @@ private extension SuggestionsObject {
     }
     
     func configureTextLayer(superLayer: CALayer?, config: SuggestionsConfig) {
-        let bubleLayer = superLayer ?? layer
+		guard let bubleLayer = superLayer ?? layer else { return }
         let textLayer = TextLayer(parent: bubleLayer, config: config)
         textLayer.suggestionFrameClosue = { [weak self] suggestion in
             return self?.frame(of: suggestion) ?? .zero
@@ -287,7 +279,7 @@ private extension SuggestionsObject {
     }
     
     func configureBlurLayer(config: SuggestionsConfig) -> CALayer? {
-        guard config.background.blurred else { return nil }
+        guard config.background.blurred, let layer = layer else { return nil }
         var newLayer: CALayer?
         blurLayer = BlurLayer(parent: layer, config: config, filteredUsed: canUseFilteredLayer, tempLayerClosure: { layer in
             newLayer = layer

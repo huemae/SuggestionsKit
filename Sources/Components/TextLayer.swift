@@ -70,7 +70,9 @@ private extension TextLayer {
         
         let isRight = suggFrame.midX > boundsForDrawing.width / 2
         layer.bounds = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
-        let newAlignment = isRight ? NSTextAlignment.right : NSTextAlignment.left
+		let newAlignment = isRight ? NSTextAlignment.right : NSTextAlignment.left
+		let stringParagraph = (newString.attributes(at: 0, effectiveRange: nil)[NSAttributedString.Key.paragraphStyle] as? NSMutableParagraphStyle)
+		let alignment = stringParagraph?.alignment ?? newAlignment
         
         
         let boundsToDraw: CGRect = boundsForDrawing
@@ -134,7 +136,7 @@ private extension TextLayer {
 
         let fromPosition = layer.position == .zero ? finalPosition : NSValue(cgPoint: layer.position.applying(.init(translationX: 0, y: superlayerYTransform)))
         
-        layer.updateInfo(text: newString, size: .init(lines: size.lines, size: size.size, alignment: newAlignment))
+        layer.updateInfo(text: newString, size: .init(lines: size.lines, size: size.size, alignment: alignment))
         
         let animations: [AnimationInfo] = [
             .init(key: #keyPath(CATextLayer.position), fromValue: fromPosition, toValue: finalPosition),

@@ -127,4 +127,14 @@ class AnimatableTextLayer: CATextLayer {
         super.removeAnimation(forKey: key)
         
     }
+	
+	override var zPosition: CGFloat {
+		get {
+			return super.zPosition
+		}
+		
+		set {
+			super.zPosition = newValue
+		}
+	}
 }

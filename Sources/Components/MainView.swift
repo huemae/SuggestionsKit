@@ -37,6 +37,19 @@ class MainView: UIView {
         super.init(frame: parent.bounds)
         commonInit(parent: parent)
     }
+	
+	
+	override func didMoveToWindow() {
+		super.didMoveToWindow()
+	}
+	
+	override func didMoveToSuperview() {
+		super.didMoveToSuperview()
+	}
+	
+	override class func didChangeValue(forKey key: String) {
+		super.didChangeValue(forKey: key)
+	}
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

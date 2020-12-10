@@ -47,18 +47,7 @@ public final class SuggestionsHelper {
         }
     }
     
-    public static func suggestionBackButton(navigationBar: UINavigationBar?, text: String) -> Suggestion? {
-        let origState = navigationBar?.isUserInteractionEnabled ?? false
-        defer {
-            navigationBar?.isUserInteractionEnabled = origState
-        }
-        navigationBar?.isUserInteractionEnabled = true
-        guard let view = navigationBar?.hitTest(.zero, with: nil) else { return nil }
-        
-        return .init(view: view, text: text)
-    }
-    
-    public static func findViewRecursively(in view: UIView?, parameters: SearchViewParameters) ->UIView? {
+    public static func findViewRecursively(in view: UIView?, parameters: SearchViewParameters) -> UIView? {
         guard let mainView = view else { return nil }
         
         switch parameters.type {
