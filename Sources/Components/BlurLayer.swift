@@ -74,7 +74,20 @@ private extension BlurLayer {
             parent.isHidden = false
         }
         
-        guard let image = UIApplication.shared.keyWindow?.snapshot()?.cgImage else { return nil }
+        guard let keyWindow: UIView = {
+            if #available(iOS 13.0, *) {
+                return UIApplication.shared.windows.first(where: { $0.isKeyWindow })
+            } else {
+                return UIApplication.shared.keyWindow
+            }
+        }() else {return nil}
+        
+        let scale = UIScreen.main.scale
+        UIGraphicsBeginImageContextWithOptions(keyWindow.bounds.size, false, scale);
+        guard let _ = UIGraphicsGetCurrentContext() else {return nil}
+        keyWindow.drawHierarchy(in: keyWindow.bounds, afterScreenUpdates: false)
+        guard let image = UIGraphicsGetImageFromCurrentImageContext()?.cgImage else {return nil}
+        UIGraphicsEndImageContext()
 
         let imageToBlur: CIImage? = CIImage(cgImage: image)
         gaussianBlurFilter?.setValue(imageToBlur, forKey: "inputImage")
